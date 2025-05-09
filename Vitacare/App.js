@@ -3,7 +3,6 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Login from "./src/pages/Login";
 import Landing from "./src/pages/Landing";
 
-
 const stack = createNativeStackNavigator();
 
 export default function App(){

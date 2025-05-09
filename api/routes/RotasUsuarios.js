@@ -60,23 +60,23 @@ class RotasUsuarios {
             //gerar um token JWT para o usuário
             const token = jwt.sign(
                 //payload
-                {id_usuario: usuario.id_usuario, nome: usuario.nome, email: usuario.email},
+                {id_usuario: usuarioEncontrado.id_usuario, nome: usuarioEncontrado.nome, email: usuarioEncontrado.email, tipo_usuario: usuarioEncontrado.tipo_usuario},
                 //signature
                 secretKey,
                 // {expiresIn: '1h'}
             )
             console.log({token, 
-                id_usuario: usuario.id_usuario, 
-                nome: usuario.nome, 
-                email: usuario.email, 
-                tipo_usuario: usuario.tipo_usuario});
+                id_usuario: usuarioEncontrado.id_usuario, 
+                nome: usuarioEncontrado.nome, 
+                email: usuarioEncontrado.email, 
+                tipo_usuario: usuarioEncontrado.tipo_usuario});
             
 
             return res.status(200).json({token, 
-                id_usuario: usuario.id_usuario, 
-                nome: usuario.nome, 
-                email: usuario.email, 
-                tipo_usuario: usuario.tipo_usuario});
+                id_usuario: usuarioEncontrado.id_usuario, 
+                nome: usuarioEncontrado.nome, 
+                email: usuarioEncontrado.email, 
+                tipo_usuario: usuarioEncontrado.tipo_usuario});
             // return res.status(200).json({ message: "Login bem-sucedido" })
 
         } catch (error) {

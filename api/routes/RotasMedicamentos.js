@@ -3,15 +3,15 @@ import { BD } from "../Db.js";
 class RotasMedicamentos{
     static async novoMedicamento(req, res){
         try{
-        const {nome, observacoes, dosagem, frequencia, data_inicio, data_fim, horarios, ativo} = req.body
-        const medicamento = await BD.query(`insert into Medicamentos
-            (nome, observacoes, dosagem, frequencia, data_inicio, data_fim, horarios, ativo)
-            VALUES($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *
-            `, [nome, observacoes, dosagem, frequencia, data_inicio, data_fim, horarios, ativo])
+        const {id_usuario, nome, observacoes, dosagem, frequencia, data_inicio, data_fim, horarios, ativo} = req.body
+        const medicamento = await BD.query(`insert into medicamentos
+            (id_usuario, nome, observacoes, dosagem, frequencia, data_inicio, data_fim, horarios, ativo)
+            VALUES($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *
+            `, [id_usuario, nome, observacoes, dosagem, frequencia, data_inicio, data_fim, horarios, ativo])
             res.status(201).json('medicamento criado com sucesso!')
         }
         catch(error){
-            res(500).json('Erro ao criar medicamento', error)
+            res.status(500).json('Erro ao criar medicamento', error)
         }
     }
 

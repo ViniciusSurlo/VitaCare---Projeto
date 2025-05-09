@@ -13,7 +13,10 @@ import { LinearGradient } from "expo-linear-gradient";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { enderecoServidor } from "../utils";
 import { Alert } from "react-native";
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import Entypo from '@expo/vector-icons/Entypo';
+import { Video } from 'expo-av';
 
 
 const Login = () => {
@@ -39,7 +42,8 @@ const Login = () => {
         }),
       });
       const dados = await resposta.json();
-
+      console.log("DADOS COMPLETOS", dados);
+      
       if (resposta.ok) {
         console.log("Login bem-sucedido:", dados);
         // Aqui você pode armazenar o token em um estado global ou AsyncStorage, se necessário
@@ -53,31 +57,49 @@ const Login = () => {
       alert(error.message);
       return;
     }
-  };   
-  
+  };
 
     return(
-      <LinearGradient colors={["#C4D7FF", "#7495DB"]} style={styles.container}>
+      <View style={styles.container}>
+        <Video
+      source={require("../assets/videofundo.mp4")} // Caminho corrigido
+      style={styles.backgroundVideo}
+      resizeMode="cover"
+      shouldPlay
+      isLooping
+      rate={3.0}
+      isMuted
+    />
+    
+    <Image source={require("../assets/circulo.png")} style={styles.circuloFundo} />
+
+{/* LOGIN */}
+<View style={styles.logincomp}> 
             <Image source={require("../assets/logo1.png")} style={styles.logo} />
-            <Text style={styles.title}>Seja Bem-Vindo!</Text>
             <Text style={styles.subtitle}>
-                O jeito inteligente de cuidar de você
+                O jeito <Text style={{color: '#0049AB'}}>inteligente</Text> de cuidar de você
             </Text>
+            <View style={styles.inputView}>
             <TextInput
-                style={styles.input}
+                
                 placeholder="Email"
                 placeholderTextColor="#aaa"
                 value={email}
                 onChangeText={setEmail}
             />
+            <MaterialCommunityIcons name="email" size={24} color="#aaa" />
+            </View>
+            
+            <View style={styles.inputView}> 
             <TextInput
-                style={styles.input}
                 placeholder="Senha"
                 placeholderTextColor="#aaa"
                 value={senha}
                 onChangeText={setSenha  }
                 secureTextEntry
             />
+            <Entypo name="eye" size={24} color="#aaa" />
+            </View>
             {/* <TextInput
                 style={styles.input}
                 placeholder="Tipo de Usuário"
@@ -86,15 +108,24 @@ const Login = () => {
                 onChangeText={setTipoUsuario}
             /> */}
             <TouchableOpacity style={styles.button} onPress={handleLogin}>
-                <Text style={styles.buttonText}>Entrar <AntDesign name="arrowright" size={24} color="black" /></Text>
+                <Text style={styles.buttonText}>Entrar </Text>
             </TouchableOpacity>
-        </LinearGradient>
+            <TouchableOpacity style={styles.button2}>
+                <Text style={styles.buttonText2}> Cadastre-se </Text>
+            </TouchableOpacity>
+</View>
+            {/* FIM */}
+        </View>
+
+     
+
     )
   }
+  
 const styles = StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: "#0049ab",
+      backgroundColor: "#ffff",
       alignItems: "center",
       justifyContent: "center",
       padding: 20,
@@ -102,43 +133,52 @@ const styles = StyleSheet.create({
     logo: {
       width: 350,
       height: 100,
-      marginBottom: 20,
       borderRadius: 10,
     },
-    title: {
-      fontSize: 28,
-      fontWeight: "bold",
-      color: "#000",
-      marginBottom: 10,
-      textAlign: "center",
-    },
+    
     subtitle: {
       fontSize: 16,
       fontWeight: "bold",
-      color: "#ffff",
       marginBottom: 30,
       textAlign: "center",
     },
-    input: {
+    inputView: {
       width: "100%",
-      backgroundColor: "#C4D7FF",
+      backgroundColor: "#ffff",
       padding: 15,
-      borderRadius: 8,
+      borderRadius: 25,
       marginBottom: 15,
-      color: "#f8fafc",
       fontSize: 16,
+      borderColor: '#C9C9C9',
+      borderWidth: 2.8,
+      flexDirection: 'row',
+      justifyContent: 'space-between'
     },
     button: {
       backgroundColor: "#0049AB",
       paddingVertical: 15,
       paddingHorizontal: 20,
-      borderRadius: 8,
+      borderRadius: 25,
       width: "100%",
       alignItems: "center",
       marginBottom: 20,
     },
     buttonText: {
       color: "#fff",
+      fontSize: 18,
+      fontWeight: "bold",
+    },
+    button2: {
+      backgroundColor: "#BED0FF",
+      paddingVertical: 15,
+      paddingHorizontal: 20,
+      borderRadius: 25,
+      width: "100%",
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    buttonText2: {
+      color: "#0049AB",
       fontSize: 18,
       fontWeight: "bold",
     },
@@ -162,6 +202,25 @@ const styles = StyleSheet.create({
       width: "100%",
       alignItems: "center",
     },
+    backgroundVideo: {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      bottom: 0,
+      right: 0,
+      width: '100%',
+      height: '100%'
+    },
+    circuloFundo: {
+      position: 'absolute',
+      top: '20%', 
+      left: 0,
+      transform: [{ scale: 1.1 }],
+    },
+    logincomp: {
+      transform: [{ scale: 0.7 }],
+      left: '-10%'
+    }
   });
   
 export default Login;

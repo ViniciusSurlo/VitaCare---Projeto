@@ -9,19 +9,31 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@animatereactnative/marquee": "^0.5.2",
+    "@animatereactnative/stagger": "^0.3.0",
     "@expo/metro-runtime": "~5.0.4",
     "@react-native-async-storage/async-storage": "^2.1.2",
+    "@react-native-community/datetimepicker": "^8.3.0",
     "@react-navigation/native": "^7.1.8",
     "@react-navigation/native-stack": "^7.3.12",
     "@supabase/supabase-js": "^2.49.4",
+    "events": "^3.3.0",
     "expo": "~53.0.8",
+    "expo-av": "^15.1.4",
     "expo-linear-gradient": "^14.1.4",
     "expo-status-bar": "~2.2.3",
+    "http": "^0.0.1-security",
+    "https": "^1.0.0",
     "react": "19.0.0",
     "react-dom": "19.0.0",
     "react-native": "0.79.2",
     "react-native-calendars": "^1.1312.0",
-    "react-native-web": "^0.20.0"
+    "react-native-gesture-handler": "^2.25.0",
+    "react-native-linear-gradient": "^2.8.3",
+    "react-native-reanimated": "^3.17.5",
+    "react-native-video": "^6.13.0",
+    "react-native-web": "^0.20.0",
+    "stream": "^0.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
