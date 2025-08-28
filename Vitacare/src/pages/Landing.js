@@ -205,7 +205,7 @@ export default function Landing() {
       <View style={styles.header}>
         <View style={{width: '80%'}}>
         <Image source={require("../assets/logo1.png")} style={styles.logo} />
-        <Text style={styles.headerText}>Olá, <Text style={{fontStyle: 'italic'}}>Usuário!</Text> </Text>
+        <Text style={styles.headerText}>Olá, <Text style={{fontStyle: 'italic'}}>Usuario!</Text> </Text>
         <Text style={styles.headerSubText}>Vamos cuidar da sua<Text style={{color: '#004AAD', fontWeight: 500}}> saúde? </Text> </Text>
         </View>
         <View style={{width: '20%', display: 'flex' }}> 
@@ -239,39 +239,7 @@ export default function Landing() {
           <Text style={styles.addButtonText}>Adicione a consulta</Text>
         </TouchableOpacity>
         </View>
-
-        {/* <View style={styles.calendar}>
-          <Calendar
-            onDayPress={(day) => {
-              setSelectedDate(day.dateString);
-              console.log("Dia selecionado:", day);
-            }}
-            markedDates={{
-              [selectedDate]: {
-                selected: true,
-                marked: true,
-                selectedColor: "#004AAD",
-              },
-            }}
-            theme={{
-              backgroundColor: "#004AAD",
-              calendarBackground: "#004AAD",
-              textSectionTitleColor: "#fff",
-              selectedDayBackgroundColor: "#2b8fff",
-              selectedDayTextColor: "#fff",
-              todayTextColor: "#A6CCFD",
-              dayTextColor: "#fff",
-              arrowColor: "#2b8fff",
-              monthTextColor: "#ffff",
-            }}
-          />
-        </View>
-        {selectedDate ? (
-          <Text style={styles.selectedDateText}>
-            Data Selecionada: {selectedDate}
-          </Text>
-        ) : null}
-      </View> */}
+      </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Remédios de Hoje</Text>

@@ -11,8 +11,8 @@ class RotasUsuarios {
         const senhaCriptografada = await bcrypt.hash(senha, saltRounds);
 
         try {
-            const usuario = await BD.query(`INSERT INTO Usuarios (nome, email, senha, tipo_usuario)
-                VALUES ($1, $2, $3, $4) RETURNING *`, [nome, email, senhaCriptografada, tipo_usuario]);
+            const usuario = await BD.query(`INSERT INTO Usuarios (nome, email, senha  )
+                VALUES ($1, $2, $3) RETURNING *`, [nome, email, senhaCriptografada]);
             res.status(201).json('Usuario criado com sucesso!');
         } catch (error) {
             console.error("Erro ao criar o usuário:", error);
