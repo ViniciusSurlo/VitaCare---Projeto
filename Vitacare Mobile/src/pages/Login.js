@@ -9,7 +9,7 @@ import {
 
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
-import { LinearGradient } from "expo-linear-gradient";
+// import { LinearGradient } from "expo-linear-gradient";
 import AntDesign from '@expo/vector-icons/AntDesign';
 import { enderecoServidor } from "../utils";
 import { Alert } from "react-native";

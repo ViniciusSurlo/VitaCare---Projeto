@@ -1,6 +1,6 @@
 import cors from 'cors'
 import express from 'express'
-import { testarConexao } from './Db.js'
+import { testarConexao } from './db.js'
 import RotasUsuarios, {autenticarToken} from './routes/RotasUsuarios.js'
 import RotasMedicamentos from './routes/RotasMedicamentos.js'
 import RotasConsultas from './routes/RotasConsultas.js'
