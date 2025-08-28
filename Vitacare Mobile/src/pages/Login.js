@@ -61,23 +61,13 @@ const Login = () => {
 
     return(
       <View style={styles.container}>
-        <Video
-      source={require("../assets/videofundo.mp4")} // Caminho corrigido
-      style={styles.backgroundVideo}
-      resizeMode="cover"
-      shouldPlay
-      isLooping
-      rate={3.0}
-      isMuted
-    />
-    
-    <Image source={require("../assets/circulo.png")} style={styles.circuloFundo} />
+      
 
 {/* LOGIN */}
 <View style={styles.logincomp}> 
             <Image source={require("../assets/logo1.png")} style={styles.logo} />
             <Text style={styles.subtitle}>
-                O jeito <Text className='text-blue'>inteligente</Text> de cuidar de você
+                O jeito <Text className='text-blue-800'>inteligente</Text> de cuidar de você
             </Text>
             <View style={styles.inputView}>
             <TextInput
@@ -113,11 +103,11 @@ const Login = () => {
             <TouchableOpacity style={styles.button2}>
                 <Text style={styles.buttonText2}> Cadastre-se </Text>
             </TouchableOpacity>
+
+            
 </View>
             {/* FIM */}
         </View>
-
-     
 
     )
   }
@@ -219,7 +209,6 @@ const styles = StyleSheet.create({
     },
     logincomp: {
       transform: [{ scale: 0.7 }],
-      left: '-10%'
     }
   });
   
