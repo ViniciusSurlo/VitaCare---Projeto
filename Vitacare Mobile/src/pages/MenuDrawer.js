@@ -1,6 +1,8 @@
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import Landing from "./Landing";
 import Login from "./Login";
+import Medicamentos from "./Medicamentos";
+import Consultas from "./Consultas"
 // import TelaInicial from "./TelaInicial"
 import Introducao from "./Introducao";
 
@@ -11,9 +13,10 @@ export default function MenuDrawer(){
         <Drawer.Navigator>
             {/* <Drawer.Screen name="TelaInicial" component={TelaInicial} /> */}
             <Drawer.Screen name="Introducao" component={Introducao} />
+            <Drawer.Screen name="Medicamentos" component={Medicamentos} />
             <Drawer.Screen name="Login" component={Login} />
             <Drawer.Screen name="Landing" component={Landing} />
-            
+            <Drawer.Screen name='Consultas' component={Consultas} />
         </Drawer.Navigator>
     )
 }

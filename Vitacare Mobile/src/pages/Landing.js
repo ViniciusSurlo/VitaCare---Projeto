@@ -1,34 +1,42 @@
 import React from "react";
-import {View, Text, StyleSheet, TouchableOpacity, ScrollView, Image, Modal, TextInput, Pressable, Platform} from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  ScrollView,
+  Image,
+  Modal,
+  TextInput,
+  Pressable,
+  Platform,
+} from "react-native";
 // import { Calendar } from "react-native-calendars"; // Importando o calendário, se necessário
 // import { supabase } from "../../lib/supabaseClient";
-import AntDesign from '@expo/vector-icons/AntDesign';
-import Ionicons from '@expo/vector-icons/Ionicons';
-import { LinearGradient } from 'expo-linear-gradient';
+import AntDesign from "@expo/vector-icons/AntDesign";
+import Ionicons from "@expo/vector-icons/Ionicons";
+import { LinearGradient } from "expo-linear-gradient";
 import { enderecoServidor } from "../utils";
 import { useEffect, useState } from "react";
+import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import DateTimePicker from '@react-native-community/datetimepicker';
-
+import DateTimePicker from "@react-native-community/datetimepicker";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
+import Entypo from "@expo/vector-icons/Entypo";
 
 export default function Landing() {
+  const navigation = useNavigation();
+
   //estados para modal consulta
   const [selectedDate, setSelectedDate] = useState("");
-  const [modalVisible, setModalVisible] = useState(false);
   const [consulta, setConsulta] = useState("");
   const [dbProvider, setDbProvider] = useState("supabase"); // ou "postgres"
   const [remedios, setRemedios] = useState([]);
 
-  //const para os dados do remedio do usuario
-  const [modalRemedioVisible, setModalRemedioVisible] = useState(false);
-  const [nome, setNome] = useState("");
-  const [observacoes, setObservacoes] = useState("");
-  const [dosagem, setDosagem] = useState("");
-  const [frequencia, setFrequencia] = useState("");
-  const [data_inicio, setdata_inicio] = useState("");
-  const [data_fim, setdata_fim] = useState("");
-  const [horarios, setHorarios] = useState("");
-  const [idUsuario, setIdUsuario] = useState("");
+  const [modalVisible, setModalVisible] = useState(false);
+  // Dados do Usuario
+  const [usuario, setUsuario] = useState("");
+  const [id_usuario, setIdUsuario] = useState("")
 
   // configurações para o input com calendario
   const [mostrarPicker, setMostrarPicker] = useState(false);
@@ -37,13 +45,12 @@ export default function Landing() {
   //estados para editar o remedio
   const [modalEditarVisible, setModalEditarVisible] = useState(false);
   const [remedioSelecionado, setRemedioSelecionado] = useState(null);
- 
-  
+
   const onChange = (event, selectedDate) => {
     setMostrarPicker(false);
     if (selectedDate) {
       setDataSelecionada(selectedDate);
-      const dataFormatada = selectedDate.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+      const dataFormatada = selectedDate.toISOString().split("T")[0]; // Formato YYYY-MM-DD
       setdata_inicio(dataFormatada);
     }
   };
@@ -55,8 +62,9 @@ export default function Landing() {
         const usuarioJSON = await AsyncStorage.getItem("UsuarioLogado");
         if (usuarioJSON) {
           const usuario = JSON.parse(usuarioJSON);
+          setUsuario(usuario.nome);
           console.log(usuario);
-          
+
           setIdUsuario(usuario.id_usuario); // ou o nome correto da chave retornada
         }
       } catch (erro) {
@@ -67,125 +75,8 @@ export default function Landing() {
     carregarUsuario();
   }, []);
 
-  //para carregar os remedios do usuario
-  useEffect(() => {
-    const carregarRemedios = async () => {
-      try {
-        const resposta = await fetch(`${enderecoServidor}/medicamentos`);
-        const dados = await resposta.json();
-        if (resposta.ok) {
-          setRemedios(dados); // Atualiza o estado com os remédios recebidos
-        } else {
-          console.error("Erro ao carregar os remédios:", dados.error);
-        }
-      } catch (erro) {
-        console.error("Erro ao buscar os remédios:", erro);
-      }
-    };
 
-    carregarRemedios();
-  }, []);
-
-
-  // Função para adicionar Remedio
-  adicionarRemedio = async () => {
-    try {
-      if (nome === "" || observacoes === "" || dosagem === "" || frequencia === "" || data_inicio === "" || data_fim === "" || horarios === "") {
-        throw new Error("Preencha todos os campos");
-      }
-      
-      const novoRemedio = {
-          id_usuario: idUsuario,
-          nome: nome,
-          observacoes: observacoes,
-          dosagem: dosagem,
-          frequencia: frequencia,
-          data_inicio: data_inicio,
-          data_fim: data_fim,
-          horarios: horarios,
-          ativo: true
-      }
-      console.log(novoRemedio);
-      
-      //autenticando utilizando a API de backend com o fetch e recebendo o token
-      const resposta = await fetch(`${enderecoServidor}/medicamentos`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(novoRemedio),
-      });
-      const dados = await resposta.json();
-      console.log("resposta do servidor", resposta)
-      console.log(dados);
-
-      if (resposta.ok) {
-        console.log("Registro bem-sucedido:", dados);
-        alert("Remédio salvo com sucesso!");
-      } else {
-        throw new Error(dados.message || "Erro ao salvar o remédio");
-      }
-    } catch (error) {
-      console.error("Erro ao salvar remedio:", error);
-      alert(error.message);
-      return;
-    }
-  }
-
-  // Função de editar Remedio
-  editarRemedio = async (idRemedio) =>{
-    try {
-      if (
-        !remedioSelecionado.nome ||
-      !remedioSelecionado.observacoes ||
-      !remedioSelecionado.dosagem ||
-      !remedioSelecionado.frequencia ||
-      !remedioSelecionado.data_inicio ||
-      !remedioSelecionado.data_fim ||
-      !remedioSelecionado.horarios
-      ) {
-        throw new Error("Preencha todos os campos");
-      }
-  
-      const remedioAtualizado = {
-        nome: remedioSelecionado.nome,
-      observacoes: remedioSelecionado.observacoes,
-      dosagem: remedioSelecionado.dosagem,
-      frequencia: remedioSelecionado.frequencia,
-      data_inicio: remedioSelecionado.data_inicio,
-      data_fim: remedioSelecionado.data_fim,
-      horarios: remedioSelecionado.horarios,
-      ativo: true,
-      };
-  
-      console.log("Atualizando remédio:", remedioAtualizado);
-  
-      const resposta = await fetch(`${enderecoServidor}/medicamentos/${idRemedio}`, {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(remedioAtualizado),
-      });
-  
-      const dados = await resposta.json();
-      console.log("Resposta do servidor:", resposta);
-      console.log("Dados recebidos:", dados);
-  
-      if (resposta.ok) {
-        console.log("Remédio atualizado com sucesso:", dados);
-        alert("Remédio editado com sucesso!");
-      } else {
-        throw new Error(dados.message || "Erro ao editar o remédio");
-      }
-  
-    } catch (error) {
-      console.error("Erro ao editar remedio:", error);
-      alert(error.message);
-    }
-  }
-
-   // Função para abrir o modal de edição
+  // Função para abrir o modal de edição
   const abrirModalEditar = (remedio) => {
     setRemedioSelecionado(remedio);
     setModalEditarVisible(true);
@@ -199,24 +90,32 @@ export default function Landing() {
     }
   };
 
-
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <View style={{width: '80%'}}>
-        <Image source={require("../assets/logo1.png")} style={styles.logo} />
-        <Text style={styles.headerText}>Olá, <Text style={{fontStyle: 'italic'}}>Usuario!</Text> </Text>
-        <Text style={styles.headerSubText}>Vamos cuidar da sua<Text style={{color: '#004AAD', fontWeight: 500}}> saúde? </Text> </Text>
+        <View style={{ width: "80%" }}>
+          {/* <View style={styles.headerCinza}> Fiz essa header para fazer a parte cinza que temos no Figma (faltou voce fechar a view la embaixo) */}
+          <Image source={require("../assets/logo1.png")} style={styles.logo} />
+          <Text style={styles.headerText}>
+            Olá, <Text style={{ fontStyle: "italic" }}>{usuario}!</Text>{" "}
+          </Text>
+          <Text style={styles.headerSubText}>
+            Vamos cuidar da sua
+            <Text style={{ color: "#004AAD", fontWeight: 500 }}>
+              {" "}
+              saúde?{" "}
+            </Text>{" "}
+          </Text>
         </View>
-        <View style={{width: '20%', display: 'flex' }}> 
-        <LinearGradient 
-        colors={['#FAF4F4', '#DEE4F4']} 
-        style={styles.linearGradient}
-        start={{ x: 0.5, y: 0 }}  
-        end={{ x: 1, y: 0.5 }}  
-        >
+        <View style={{ width: "20%", display: "flex" }}>
+          <LinearGradient
+            colors={["#FAF4F4", "#DEE4F4"]}
+            style={styles.linearGradient}
+            start={{ x: 0.5, y: 0 }}
+            end={{ x: 1, y: 0.5 }}
+          >
             <Ionicons name="notifications" size={24} color="black" />
-        </LinearGradient>
+          </LinearGradient>
         </View>
       </View>
 
@@ -226,18 +125,17 @@ export default function Landing() {
           justifyContent: "space-around",
           marginBottom: 20,
         }}
-      >
-      </View>
-     
+      ></View>
+
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Consultas</Text>
-        <View> 
-      <TouchableOpacity
-          style={styles.addButton}
-          onPress={() => setModalVisible(true)}
-        >
-          <Text style={styles.addButtonText}>Adicione a consulta</Text>
-        </TouchableOpacity>
+        <View>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={() => navigation.navigate("Consultas")}
+          >
+            <Text style={styles.addButtonText}>Adicione a consulta</Text>
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -256,10 +154,18 @@ export default function Landing() {
             .map((remedio) => (
               <View key={remedio.id_medicamento} style={styles.card}>
                 <Text style={styles.cardTitle}>{remedio.nome}</Text>
-                <Text style={styles.cardSubtitle}>Dosagem: {remedio.dosagem}</Text>
-                <Text style={styles.cardSubtitle}>Frequência: {remedio.frequencia}</Text>
-                <Text style={styles.cardSubtitle}>Horários: {remedio.horarios}</Text>
-                <Text style={styles.cardSubtitle}>Observações: {remedio.observacoes}</Text>
+                <Text style={styles.cardSubtitle}>
+                  Dosagem: {remedio.dosagem}
+                </Text>
+                <Text style={styles.cardSubtitle}>
+                  Frequência: {remedio.frequencia}
+                </Text>
+                <Text style={styles.cardSubtitle}>
+                  Horários: {remedio.horarios}
+                </Text>
+                <Text style={styles.cardSubtitle}>
+                  Observações: {remedio.observacoes}
+                </Text>
                 <View style={styles.cardActions}>
                   <TouchableOpacity
                     style={styles.cardButton}
@@ -274,133 +180,185 @@ export default function Landing() {
           <Text style={styles.noDataText}>Nenhum remédio para hoje.</Text>
         )}
       </View>
-
+      {/* </View> */}
+    
       {/* Modal de Edição */}
-<Modal
-  animationType="slide"
-  transparent={true}
-  visible={modalEditarVisible}
-  onRequestClose={() => setModalEditarVisible(false)}
->
-  <View style={styles.modalContainer}>
-    <View style={styles.modalContent}>
-      <Text style={styles.modalTitle}>Editar Remédio</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nome do remédio"
-        placeholderTextColor="#aaa"
-        value={remedioSelecionado?.nome || ""}
-        onChangeText={(text) =>
-          setRemedioSelecionado({ ...remedioSelecionado, nome: text })
-        }
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Dosagem"
-        placeholderTextColor="#aaa"
-        value={remedioSelecionado?.dosagem || ""}
-        onChangeText={(text) =>
-          setRemedioSelecionado({ ...remedioSelecionado, dosagem: text })
-        }
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Frequência"
-        placeholderTextColor="#aaa"
-        value={remedioSelecionado?.frequencia || ""}
-        onChangeText={(text) =>
-          setRemedioSelecionado({ ...remedioSelecionado, frequencia: text })
-        }
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Horários"
-        placeholderTextColor="#aaa"
-        value={remedioSelecionado?.horarios || ""}
-        onChangeText={(text) =>
-          setRemedioSelecionado({ ...remedioSelecionado, horarios: text })
-        }
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Data de início (YYYY-MM-DD)"
-        placeholderTextColor="#aaa"
-        value={remedioSelecionado?.data_inicio || ""}
-        onChangeText={(text) =>
-          setRemedioSelecionado({ ...remedioSelecionado, data_inicio: text })
-        }
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Data de fim (YYYY-MM-DD)"
-        placeholderTextColor="#aaa"
-        value={remedioSelecionado?.data_fim || ""}
-        onChangeText={(text) =>
-          setRemedioSelecionado({ ...remedioSelecionado, data_fim: text })
-        }
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Observações"
-        placeholderTextColor="#aaa"
-        value={remedioSelecionado?.observacoes || ""}
-        onChangeText={(text) =>
-          setRemedioSelecionado({ ...remedioSelecionado, observacoes: text })
-        }
-      />
-      <TouchableOpacity
-        style={styles.saveButton}
-        onPress={salvarEdicao}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={modalEditarVisible}
+        onRequestClose={() => setModalEditarVisible(false)}
       >
-        <Text style={styles.saveButtonText}>Salvar</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.cancelButton}
-        onPress={() => setModalEditarVisible(false)}
-      >
-        <Text style={styles.cancelButtonText}>Cancelar</Text>
-      </TouchableOpacity>
-    </View>
-  </View>
-</Modal>
-
-
-      <View style={styles.section}>
-  <Text style={styles.sectionTitle}>Medicações <AntDesign name="medicinebox" size={24} color="black" /></Text>
-  {/* if ternário para verificar se o tamanho do array é maior que 0 */}
-  {remedios.length > 0 ? (
-    remedios
-      .filter((remedio) => remedio.ativo) // Filtra apenas os remédios com ativo = true
-      .map((remedio) => (
-        <View key={remedio.id_medicamento} style={styles.card}>
-          <Text style={styles.cardTitle}>{remedio.nome}</Text>
-          <Text style={styles.cardSubtitle}>Dosagem: {remedio.dosagem}</Text>
-          <Text style={styles.cardSubtitle}>Frequência: {remedio.frequencia}</Text>
-          <Text style={styles.cardSubtitle}>Observações: {remedio.observacoes}</Text>
-          
-          {/* Botões para editar e deletar */}
-          <View style={styles.cardActions}>
-            <TouchableOpacity
-              style={styles.cardButton}
-              onPress={() => abrirModalEditar(remedio)} // Abre o modal de edição
-            >
-              <Text style={styles.cardButtonText}>Editar</Text>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Editar Remédio</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Nome do remédio"
+              placeholderTextColor="#aaa"
+              value={remedioSelecionado?.nome || ""}
+              onChangeText={(text) =>
+                setRemedioSelecionado({ ...remedioSelecionado, nome: text })
+              }
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Dosagem"
+              placeholderTextColor="#aaa"
+              value={remedioSelecionado?.dosagem || ""}
+              onChangeText={(text) =>
+                setRemedioSelecionado({ ...remedioSelecionado, dosagem: text })
+              }
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Frequência"
+              placeholderTextColor="#aaa"
+              value={remedioSelecionado?.frequencia || ""}
+              onChangeText={(text) =>
+                setRemedioSelecionado({
+                  ...remedioSelecionado,
+                  frequencia: text,
+                })
+              }
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Horários"
+              placeholderTextColor="#aaa"
+              value={remedioSelecionado?.horarios || ""}
+              onChangeText={(text) =>
+                setRemedioSelecionado({ ...remedioSelecionado, horarios: text })
+              }
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Data de início (YYYY-MM-DD)"
+              placeholderTextColor="#aaa"
+              value={remedioSelecionado?.data_inicio || ""}
+              onChangeText={(text) =>
+                setRemedioSelecionado({
+                  ...remedioSelecionado,
+                  data_inicio: text,
+                })
+              }
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Data de fim (YYYY-MM-DD)"
+              placeholderTextColor="#aaa"
+              value={remedioSelecionado?.data_fim || ""}
+              onChangeText={(text) =>
+                setRemedioSelecionado({ ...remedioSelecionado, data_fim: text })
+              }
+            />
+            <TextInput
+              style={styles.input}
+              placeholder="Observações"
+              placeholderTextColor="#aaa"
+              value={remedioSelecionado?.observacoes || ""}
+              onChangeText={(text) =>
+                setRemedioSelecionado({
+                  ...remedioSelecionado,
+                  observacoes: text,
+                })
+              }
+            />
+            <TouchableOpacity style={styles.saveButton} onPress={salvarEdicao}>
+              <Text style={styles.saveButtonText}>Salvar</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={styles.cardButton}
-              onPress={() => {
-                console.log("Deletar remédio:", remedio.id_medicamento);
-              }}
+              style={styles.cancelButton}
+              onPress={() => setModalEditarVisible(false)}
             >
-              <Text style={styles.cardButtonText}>Deletar</Text>
+              <Text style={styles.cancelButtonText}>Cancelar</Text>
             </TouchableOpacity>
           </View>
         </View>
-      ))
-  ) : (
-    <Text style={styles.noDataText}>Nenhum remédio disponível.</Text>
-  )}
-</View>
+      </Modal>
+
+      {/* cards para acessar os remedios, consultas, sla oq e balblabla */}
+      <View className="mt-6 mb-6 p-4">
+        <View className="flex-row justify-between mb-4">
+          {/* Card Remédios */}
+          <TouchableOpacity
+            className="bg-gray-100 rounded-xl w-[48%] h-48 items-center justify-start"
+            onPress={() => navigation.navigate("Medicamentos")}
+          >
+            
+            <Text className="text-lg font-bold mt-2">Remédios</Text>
+            <Text className="text-gray-500 text-center text-xs mt-1 px-2">
+              Veja aqui seus medicamentos
+            </Text>
+            <Ionicons
+              name="medkit"
+              size={55}
+              color="#2683ff"
+              style={{ marginTop: 12 }}
+            />
+          </TouchableOpacity>
+
+          {/* Card Blablabla */}
+          <TouchableOpacity
+            className="bg-gray-100 rounded-xl w-[48%] h-48 items-center justify-start"
+            onPress={() => {
+              /* ação blablabla */
+            }}
+          >
+            
+            <Text className="text-lg font-bold mt-2">Blablabla</Text>
+            <Text className="text-gray-500 text-center text-xs mt-1 px-2">
+              Veja aqui seus blablablas
+            </Text>
+            <MaterialCommunityIcons
+              name="chat"
+              size={55}
+              color="#2683ff"
+              style={{ marginTop: 12 }}
+            />
+          </TouchableOpacity>
+        </View>
+
+        <View className="flex-row justify-between">
+          {/* Card Sei la Oq */}
+          <TouchableOpacity
+            className="bg-gray-100 rounded-xl w-[48%] h-48 items-center justify-start"
+            onPress={() => {
+              /* ação sei la oq */
+            }}
+          >
+            
+            <Text className="text-lg font-bold mt-2">Sei la Oq</Text>
+            <Text className="text-gray-500 text-center text-xs mt-1 px-2">
+              Veja aqui seus sei la o ques
+            </Text>
+            <Entypo
+              name="help"
+              size={55}
+              color="#2683ff"
+              style={{ marginTop: 12 }}
+            />
+          </TouchableOpacity>
+
+          {/* Card Consultas */}
+          <TouchableOpacity
+            className="bg-gray-100 rounded-xl w-[48%] h-48 items-center justify-start"
+            onPress={() => navigation.navigate("Consultas")}
+          >
+            
+            <Text className="text-lg font-bold mt-2">Consultas</Text>
+            <Text className="text-gray-500 text-center text-xs mt-1 px-2">
+              Veja aqui suas consultas
+            </Text>
+            <Ionicons
+              name="calendar"
+              size={55}
+              color="#2683ff"
+              style={{ marginTop: 12 }}
+            />
+          </TouchableOpacity>
+        </View>
+      </View>
 
       {/* Modal para adicionar consulta */}
       <Modal
@@ -427,123 +385,18 @@ export default function Landing() {
               value={selectedDate}
               onChangeText={(text) => setSelectedDate(text)}
             />
-            <TouchableOpacity
-              style={styles.saveButton}     
-            >
+            <TouchableOpacity style={styles.saveButton}>
               <Text style={styles.saveButtonText}>Salvar</Text>
-            </TouchableOpacity> 
+            </TouchableOpacity>
             <TouchableOpacity
               style={styles.cancelButton}
-              onPress={() => setModalVisible(false)}
+              // onPress={() => setModalVisible(false)}
             >
               <Text style={styles.cancelButtonText}>Cancelar</Text>
             </TouchableOpacity>
           </View>
         </View>
       </Modal>
-
-      {/* Modal para adicionar remédio */}
-<Modal
-  animationType="slide"
-  transparent={true}
-  visible={modalRemedioVisible}
-  onRequestClose={() => setModalRemedioVisible(false)}
->
-  <View style={styles.modalContainer}>
-    <View style={styles.modalContent}>
-      <Text style={styles.modalTitle}>Adicionar Remédio</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Nome do remédio"
-        placeholderTextColor="#aaa"
-        value={nome}
-        onChangeText={setNome}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Observações (ex: tomar com água)"
-        placeholderTextColor="#aaa"
-        value={observacoes}
-        onChangeText={setObservacoes}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Dosagem (ex: 30 mg, 10 ml)"
-        placeholderTextColor="#aaa"
-        value={dosagem}
-        onChangeText={setDosagem}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Frequência (ex: 2x ao dia)"
-        placeholderTextColor="#aaa"
-        value={frequencia}
-        onChangeText={setFrequencia}
-      />
-
-      {/* Textinput com calendario */}
-      {/* Funcionalidade incompatibilidade quando testado na web */}
-      {/* Habilitar quando testar no celular */}
-      {/* <Pressable onPress={() => setMostrarPicker(true)}>
-        <TextInput
-          style={styles.input}
-          placeholder="Data de início (YYYY-MM-DD)"
-          placeholderTextColor="#aaa"
-          value={data_inicio}
-          editable={false} // impede edição manual
-          pointerEvents="none" // impede interação direta no Android
-        />
-      </Pressable>
-
-      {mostrarPicker && (
-        <DateTimePicker
-          value={dataSelecionada}
-          mode="date"
-          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-          onChange={onChange}
-        />
-      )} */}
-      <TextInput
-        style={styles.input}
-        placeholder="Data de início (YYYY-MM-DD)"
-        placeholderTextColor="#aaa"
-        value={data_inicio}
-        onChangeText={setdata_inicio}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Data de fim (YYYY-MM-DD)"
-        placeholderTextColor="#aaa"
-        value={data_fim}
-        onChangeText={setdata_fim}
-      />
-      <TextInput
-        style={styles.input}
-        placeholder="Horários (ex: 08:00, 12:00)"
-        placeholderTextColor="#aaa"
-        value={horarios}
-        onChangeText={setHorarios}
-      />
-      
-      <TouchableOpacity
-        style={styles.saveButton}
-        onPress={() => {
-          adicionarRemedio()
-          setModalRemedioVisible(false);
-        }}
-      >
-        <Text style={styles.saveButtonText}>Salvar</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        style={styles.cancelButton}
-        onPress={() => setModalRemedioVisible(false)}
-      >
-        <Text style={styles.cancelButtonText}>Cancelar</Text>
-      </TouchableOpacity>
-    </View>
-  </View>
-</Modal>
-
     </ScrollView>
   );
 }
@@ -551,14 +404,13 @@ export default function Landing() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#f8fafc",
+    backgroundColor: "#ffff",
     padding: 20,
-    
   },
   cardActions: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'center',
+    display: "flex",
+    flexDirection: "row",
+    justifyContent: "center",
     marginBottom: 20,
     padding: 10,
   },
@@ -574,12 +426,18 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
   },
   header: {
-    display: 'flex',
+    display: "flex",
     justifyContent: "space-between",
     marginBottom: 20,
-    flexDirection: 'row',
+    flexDirection: "row",
     margin: 10
   },
+  // headerCinza: {
+  //   backgroundColor: "#e4e4e5",
+  //   borderRadius: 25,
+  //   height: 100,
+  //   width: 100%
+  // },
   headerText: {
     fontSize: 24,
     fontWeight: 400,
@@ -645,9 +503,9 @@ const styles = StyleSheet.create({
     color: "#64748b",
   },
   logo: {
-    width: '60%',
-    height: '60%',
-    marginLeft: -10
+    width: "60%",
+    height: "60%",
+    marginLeft: -10,
   },
   selectedDateText: {
     marginTop: 10,
@@ -708,10 +566,10 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 10,
-    alignItems: 'center',
-    flexDirection: 'center',
-    justifyContent: 'center',
-    marginTop: '20%'
+    alignItems: "center",
+    flexDirection: "center",
+    justifyContent: "center",
+    marginTop: "20%",
   },
   noDataText: {
     fontSize: 16,
