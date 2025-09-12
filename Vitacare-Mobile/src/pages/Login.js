@@ -25,6 +25,7 @@ const Login = () => {
   const [tipo_usuario, setTipoUsuario] = useState("");
   const [ativo, setAtivo] = useState(true);
   const [lembrar, setLembrar] = useState(false);
+  const [mostrarSenha, setMostrarSenha] = useState(false);  
 
   const handleLogin = async () => {
     try {
@@ -62,6 +63,7 @@ const Login = () => {
 
   return (
     <View style={styles.container}>
+      <Text className='absolute top-8 left-6 z-10' onClick={() => navigation.goBack()}><MaterialCommunityIcons name='arrow-left' size={34} /></Text>
       {/* LOGIN */}
       <View style={styles.logincomp}>
         <Image source={require("../assets/logo1.png")} style={styles.logo} />
@@ -92,16 +94,18 @@ const Login = () => {
             placeholderTextColor="#aaa"
             value={senha}
             onChangeText={setSenha}
-            secureTextEntry
+            secureTextEntry={!mostrarSenha}
             className="flex-1 justify-center text-lg"
           />
 
+          <TouchableOpacity onPress={() => setMostrarSenha(!mostrarSenha)}>
           <Entypo
-            name="eye"
+            name={mostrarSenha ? "eye" : "eye-with-line"}
             size={24}
             color="#aaa"
             className="text-center items-center justify-center"
           />
+          </TouchableOpacity>
         </View>
         {/* <TextInput
                 style={styles.input}

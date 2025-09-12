@@ -36,7 +36,7 @@ export default function Landing() {
   const [modalVisible, setModalVisible] = useState(false);
   // Dados do Usuario
   const [usuario, setUsuario] = useState("");
-  const [id_usuario, setIdUsuario] = useState("")
+  const [id_usuario, setIdUsuario] = useState("");
 
   // configurações para o input com calendario
   const [mostrarPicker, setMostrarPicker] = useState(false);
@@ -75,7 +75,6 @@ export default function Landing() {
     carregarUsuario();
   }, []);
 
-
   // Função para abrir o modal de edição
   const abrirModalEditar = (remedio) => {
     setRemedioSelecionado(remedio);
@@ -88,6 +87,11 @@ export default function Landing() {
       await editarRemedio(remedioSelecionado.id_medicamento);
       setModalEditarVisible(false);
     }
+  };
+
+  const logout = async () => {
+    await AsyncStorage.removeItem("UsuarioLogado");
+    navigation.navigate("Login");
   };
 
   return (
@@ -128,7 +132,15 @@ export default function Landing() {
       ></View>
 
       <View style={styles.section}>
+        <View className='flex-row justify-between p-4'>
         <Text style={styles.sectionTitle}>Consultas</Text>
+          <TouchableOpacity
+            onPress={logout}
+            className="bg-blue-500 rounded-sm py-2 px-4 ml-auto"
+          >
+          <Text className='text-white font-bold'>SAIR</Text>
+        </TouchableOpacity>
+        </View>
         <View>
           <TouchableOpacity
             style={styles.addButton}
@@ -181,7 +193,7 @@ export default function Landing() {
         )}
       </View>
       {/* </View> */}
-    
+
       {/* Modal de Edição */}
       <Modal
         animationType="slide"
@@ -285,7 +297,6 @@ export default function Landing() {
             className="bg-gray-100 rounded-xl w-[48%] h-48 items-center justify-start"
             onPress={() => navigation.navigate("Medicamentos")}
           >
-            
             <Text className="text-lg font-bold mt-2">Remédios</Text>
             <Text className="text-gray-500 text-center text-xs mt-1 px-2">
               Veja aqui seus medicamentos
@@ -305,7 +316,6 @@ export default function Landing() {
               /* ação blablabla */
             }}
           >
-            
             <Text className="text-lg font-bold mt-2">Blablabla</Text>
             <Text className="text-gray-500 text-center text-xs mt-1 px-2">
               Veja aqui seus blablablas
@@ -327,7 +337,6 @@ export default function Landing() {
               /* ação sei la oq */
             }}
           >
-            
             <Text className="text-lg font-bold mt-2">Sei la Oq</Text>
             <Text className="text-gray-500 text-center text-xs mt-1 px-2">
               Veja aqui seus sei la o ques
@@ -345,7 +354,6 @@ export default function Landing() {
             className="bg-gray-100 rounded-xl w-[48%] h-48 items-center justify-start"
             onPress={() => navigation.navigate("Consultas")}
           >
-            
             <Text className="text-lg font-bold mt-2">Consultas</Text>
             <Text className="text-gray-500 text-center text-xs mt-1 px-2">
               Veja aqui suas consultas
@@ -430,7 +438,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     marginBottom: 20,
     flexDirection: "row",
-    margin: 10
+    margin: 10,
   },
   // headerCinza: {
   //   backgroundColor: "#e4e4e5",
