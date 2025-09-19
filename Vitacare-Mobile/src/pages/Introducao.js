@@ -34,6 +34,7 @@ export default function Introducao() {
 
   <TouchableOpacity
     className="border-4 flex flex-row border-white bg-gray-100 rounded-full w-40 h-12 justify-center items-center space-x-2"
+    onPress={() => navigation.navigate("Cadastro")}
   >
     <Text className="text-black text-lg font-sans">Cadastrar</Text>
     <View className='h-8 w-8 bg-blue-600 rounded-full flex justify-center items-center'>

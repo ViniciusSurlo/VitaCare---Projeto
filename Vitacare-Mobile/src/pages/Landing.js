@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
   Text,
@@ -6,26 +6,17 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
-  Modal,
-  TextInput,
-  Pressable,
-  Platform,
 } from "react-native";
-// import { Calendar } from "react-native-calendars"; // Importando o calendário, se necessário
-// import { supabase } from "../../lib/supabaseClient";
-import AntDesign from "@expo/vector-icons/AntDesign";
-import Ionicons from "@expo/vector-icons/Ionicons";
-import { LinearGradient } from "expo-linear-gradient";
-import { enderecoServidor } from "../utils";
-import { useEffect, useState } from "react";
+import { Ionicons, MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import { LinearGradient } from "expo-linear-gradient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import DateTimePicker from "@react-native-community/datetimepicker";
-import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
-import Entypo from "@expo/vector-icons/Entypo";
+import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
+import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 
-export default function Landing() {
-  const navigation = useNavigation();
+
+export default function Landing({ navigation }) {
+  // const navigation = useNavigation();
 
   //estados para modal consulta
   const [selectedDate, setSelectedDate] = useState("");
@@ -55,7 +46,6 @@ export default function Landing() {
     }
   };
 
-  //para carregar os dados do usuario logado
   useEffect(() => {
     const carregarUsuario = async () => {
       try {
@@ -75,514 +65,201 @@ export default function Landing() {
     carregarUsuario();
   }, []);
 
-  // Função para abrir o modal de edição
-  const abrirModalEditar = (remedio) => {
-    setRemedioSelecionado(remedio);
-    setModalEditarVisible(true);
-  };
-
-  // Função para salvar as alterações
-  const salvarEdicao = async () => {
-    if (remedioSelecionado) {
-      await editarRemedio(remedioSelecionado.id_medicamento);
-      setModalEditarVisible(false);
-    }
-  };
-
-  const logout = async () => {
-    await AsyncStorage.removeItem("UsuarioLogado");
-    navigation.navigate("Login");
-  };
+  const dias = [
+    { dia: "Seg", num: "25" },
+    { dia: "Ter", num: "26" },
+    { dia: "Qua", num: "27" },
+    { dia: "Qui", num: "28" },
+    { dia: "Sex", num: "29" },
+  ];
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <View style={{ width: "80%" }}>
-          {/* <View style={styles.headerCinza}> Fiz essa header para fazer a parte cinza que temos no Figma (faltou voce fechar a view la embaixo) */}
-          <Image source={require("../assets/logo1.png")} style={styles.logo} />
-          <Text style={styles.headerText}>
-            Olá, <Text style={{ fontStyle: "italic" }}>{usuario}!</Text>{" "}
-          </Text>
-          <Text style={styles.headerSubText}>
-            Vamos cuidar da sua
-            <Text style={{ color: "#004AAD", fontWeight: 500 }}>
-              {" "}
-              saúde?{" "}
-            </Text>{" "}
-          </Text>
-        </View>
-        <View style={{ width: "20%", display: "flex" }}>
-          <LinearGradient
-            colors={["#FAF4F4", "#DEE4F4"]}
-            style={styles.linearGradient}
-            start={{ x: 0.5, y: 0 }}
-            end={{ x: 1, y: 0.5 }}
+    <View style={styles.container}>
+      <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+        <View style={styles.header}>
+          {/* Header da Header */}
+          <View
+            style={{
+              flexDirection: "row",
+              gap: 15,
+              padding: 20,
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
           >
-            <Ionicons name="notifications" size={24} color="black" />
-          </LinearGradient>
-        </View>
-      </View>
-
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-around",
-          marginBottom: 20,
-        }}
-      ></View>
-
-      <View style={styles.section}>
-        <View className='flex-row justify-between p-4'>
-        <Text style={styles.sectionTitle}>Consultas</Text>
-          <TouchableOpacity
-            onPress={logout}
-            className="bg-blue-500 rounded-sm py-2 px-4 ml-auto"
-          >
-          <Text className='text-white font-bold'>SAIR</Text>
-        </TouchableOpacity>
-        </View>
-        <View>
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={() => navigation.navigate("Consultas")}
-          >
-            <Text style={styles.addButtonText}>Adicione a consulta</Text>
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Remédios de Hoje</Text>
-        {remedios.length > 0 ? (
-          remedios
-            .filter((remedio) => {
-              const hoje = new Date().toISOString().split("T")[0];
-              return (
-                remedio.ativo &&
-                remedio.data_inicio <= hoje &&
-                remedio.data_fim >= hoje
-              );
-            })
-            .map((remedio) => (
-              <View key={remedio.id_medicamento} style={styles.card}>
-                <Text style={styles.cardTitle}>{remedio.nome}</Text>
-                <Text style={styles.cardSubtitle}>
-                  Dosagem: {remedio.dosagem}
-                </Text>
-                <Text style={styles.cardSubtitle}>
-                  Frequência: {remedio.frequencia}
-                </Text>
-                <Text style={styles.cardSubtitle}>
-                  Horários: {remedio.horarios}
-                </Text>
-                <Text style={styles.cardSubtitle}>
-                  Observações: {remedio.observacoes}
-                </Text>
-                <View style={styles.cardActions}>
-                  <TouchableOpacity
-                    style={styles.cardButton}
-                    onPress={() => abrirModalEditar(remedio)}
-                  >
-                    <Text style={styles.cardButtonText}>Editar</Text>
-                  </TouchableOpacity>
-                </View>
+            <View style={{display: "flex", flexDirection: "row", gap: 15, alignItems: "center"}}>
+              <View
+                style={{
+                  width: 60,
+                  height: 60,
+                  borderRadius: 30,
+                  overflow: "hidden",
+                  backgroundColor: "#fff",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <Image
+                  source={{
+                    uri: "https://i.pinimg.com/736x/61/8f/b1/618fb1a8cf308ceea61c5d1545e5fd7a.jpg",
+                  }}
+                  style={{ width: 60, height: 60, borderRadius: 30 }}
+                  resizeMode="cover"
+                />
               </View>
-            ))
-        ) : (
-          <Text style={styles.noDataText}>Nenhum remédio para hoje.</Text>
-        )}
-      </View>
-      {/* </View> */}
 
-      {/* Modal de Edição */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalEditarVisible}
-        onRequestClose={() => setModalEditarVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Editar Remédio</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Nome do remédio"
-              placeholderTextColor="#aaa"
-              value={remedioSelecionado?.nome || ""}
-              onChangeText={(text) =>
-                setRemedioSelecionado({ ...remedioSelecionado, nome: text })
-              }
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Dosagem"
-              placeholderTextColor="#aaa"
-              value={remedioSelecionado?.dosagem || ""}
-              onChangeText={(text) =>
-                setRemedioSelecionado({ ...remedioSelecionado, dosagem: text })
-              }
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Frequência"
-              placeholderTextColor="#aaa"
-              value={remedioSelecionado?.frequencia || ""}
-              onChangeText={(text) =>
-                setRemedioSelecionado({
-                  ...remedioSelecionado,
-                  frequencia: text,
-                })
-              }
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Horários"
-              placeholderTextColor="#aaa"
-              value={remedioSelecionado?.horarios || ""}
-              onChangeText={(text) =>
-                setRemedioSelecionado({ ...remedioSelecionado, horarios: text })
-              }
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Data de início (YYYY-MM-DD)"
-              placeholderTextColor="#aaa"
-              value={remedioSelecionado?.data_inicio || ""}
-              onChangeText={(text) =>
-                setRemedioSelecionado({
-                  ...remedioSelecionado,
-                  data_inicio: text,
-                })
-              }
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Data de fim (YYYY-MM-DD)"
-              placeholderTextColor="#aaa"
-              value={remedioSelecionado?.data_fim || ""}
-              onChangeText={(text) =>
-                setRemedioSelecionado({ ...remedioSelecionado, data_fim: text })
-              }
-            />
-            <TextInput
-              style={styles.input}
-              placeholder="Observações"
-              placeholderTextColor="#aaa"
-              value={remedioSelecionado?.observacoes || ""}
-              onChangeText={(text) =>
-                setRemedioSelecionado({
-                  ...remedioSelecionado,
-                  observacoes: text,
-                })
-              }
-            />
-            <TouchableOpacity style={styles.saveButton} onPress={salvarEdicao}>
-              <Text style={styles.saveButtonText}>Salvar</Text>
-            </TouchableOpacity>
+              <View>
+                <Text style={styles.bomdia}>Bom dia,</Text>
+                <Text style={styles.usuario}>{usuario}</Text>
+              </View>
+            </View>
+            
+            {/* Notificação */}
             <TouchableOpacity
-              style={styles.cancelButton}
-              onPress={() => setModalEditarVisible(false)}
+              style={{
+                backgroundColor: "#fff",
+                padding: 4,
+                borderRadius: 10,
+                alignSelf: "flex-start",
+                borderBottomColor: "black",
+                
+              }}
             >
-              <Text style={styles.cancelButtonText}>Cancelar</Text>
+              <Ionicons name="notifications-outline" size={30} color="black" />
             </TouchableOpacity>
           </View>
-        </View>
-      </Modal>
 
-      {/* cards para acessar os remedios, consultas, sla oq e balblabla */}
-      <View className="mt-6 mb-6 p-4">
-        <View className="flex-row justify-between mb-4">
-          {/* Card Remédios */}
-          <TouchableOpacity
-            className="bg-gray-100 rounded-xl w-[48%] h-48 items-center justify-start"
-            onPress={() => navigation.navigate("Medicamentos")}
-          >
-            <Text className="text-lg font-bold mt-2">Remédios</Text>
-            <Text className="text-gray-500 text-center text-xs mt-1 px-2">
-              Veja aqui seus medicamentos
+          <View>
+            {/* Pergunta */}
+            <Text style={styles.pergunta}>
+              Como você está se sentindo hoje?
             </Text>
-            <Ionicons
-              name="medkit"
-              size={55}
-              color="#2683ff"
-              style={{ marginTop: 12 }}
-            />
-          </TouchableOpacity>
 
-          {/* Card Blablabla */}
-          <TouchableOpacity
-            className="bg-gray-100 rounded-xl w-[48%] h-48 items-center justify-start"
-            onPress={() => {
-              /* ação blablabla */
-            }}
-          >
-            <Text className="text-lg font-bold mt-2">Blablabla</Text>
-            <Text className="text-gray-500 text-center text-xs mt-1 px-2">
-              Veja aqui seus blablablas
-            </Text>
-            <MaterialCommunityIcons
-              name="chat"
-              size={55}
-              color="#2683ff"
-              style={{ marginTop: 12 }}
-            />
-          </TouchableOpacity>
-        </View>
-
-        <View className="flex-row justify-between">
-          {/* Card Sei la Oq */}
-          <TouchableOpacity
-            className="bg-gray-100 rounded-xl w-[48%] h-48 items-center justify-start"
-            onPress={() => {
-              /* ação sei la oq */
-            }}
-          >
-            <Text className="text-lg font-bold mt-2">Sei la Oq</Text>
-            <Text className="text-gray-500 text-center text-xs mt-1 px-2">
-              Veja aqui seus sei la o ques
-            </Text>
-            <Entypo
-              name="help"
-              size={55}
-              color="#2683ff"
-              style={{ marginTop: 12 }}
-            />
-          </TouchableOpacity>
-
-          {/* Card Consultas */}
-          <TouchableOpacity
-            className="bg-gray-100 rounded-xl w-[48%] h-48 items-center justify-start"
-            onPress={() => navigation.navigate("Consultas")}
-          >
-            <Text className="text-lg font-bold mt-2">Consultas</Text>
-            <Text className="text-gray-500 text-center text-xs mt-1 px-2">
-              Veja aqui suas consultas
-            </Text>
-            <Ionicons
-              name="calendar"
-              size={55}
-              color="#2683ff"
-              style={{ marginTop: 12 }}
-            />
-          </TouchableOpacity>
-        </View>
-      </View>
-
-      {/* Modal para adicionar consulta */}
-      <Modal
-        animationType="slide"
-        transparent={true}
-        visible={modalVisible}
-        onRequestClose={() => setModalVisible(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>Adicionar Consulta</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Nome da consulta"
-              placeholderTextColor="#aaa"
-              value={consulta}
-              onChangeText={setConsulta}
-            />
-            <Text></Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Data da consulta (YYYY-MM-DD)"
-              placeholderTextColor="#aaa"
-              value={selectedDate}
-              onChangeText={(text) => setSelectedDate(text)}
-            />
-            <TouchableOpacity style={styles.saveButton}>
-              <Text style={styles.saveButtonText}>Salvar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              style={styles.cancelButton}
-              // onPress={() => setModalVisible(false)}
-            >
-              <Text style={styles.cancelButtonText}>Cancelar</Text>
-            </TouchableOpacity>
+            {/* Botões de opções */}
+            <View style={styles.opcoes}>
+              <TouchableOpacity style={styles.opcaoBtn}>
+                <Text> <FontAwesome5 name="clipboard-check" size={24} color="black" /> Checkup</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.opcaoBtn}>
+                <Text> <MaterialIcons name="health-and-safety" size={24} color="black" /> Remédios</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.opcaoBtn}>
+                <Text>IA</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </Modal>
-    </ScrollView>
+
+        {/* Dias */}
+        <View style={styles.dias}>
+          {dias.map((d, i) => (
+            <View
+              key={i}
+              style={[styles.diaItem, d.dia === "Qua" && styles.diaSelecionado]}
+            >
+              <Text>{d.dia}</Text>
+              <Text>{d.num}</Text>
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+
+      
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#ffff",
-    padding: 20,
-  },
-  cardActions: {
-    display: "flex",
-    flexDirection: "row",
-    justifyContent: "center",
-    marginBottom: 20,
-    padding: 10,
-  },
-  cardButton: {
-    backgroundColor: "#2683ff",
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-  cardButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
+  container: { flex: 1, backgroundColor: "#fff" },
   header: {
-    display: "flex",
-    justifyContent: "space-between",
-    marginBottom: 20,
-    flexDirection: "row",
-    margin: 10,
-  },
-  // headerCinza: {
-  //   backgroundColor: "#e4e4e5",
-  //   borderRadius: 25,
-  //   height: 100,
-  //   width: 100%
-  // },
-  headerText: {
-    fontSize: 24,
-    fontWeight: 400,
-    color: "#000000",
-  },
-  headerSubText: {
-    fontSize: 18,
-    fontWeight: 400,
-    color: "#000000",
-  },
-  addButton: {
-    backgroundColor: "#2683ff",
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 8,
-    gap: 10,
-    marginBottom: 10,
-  },
-  addButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  section: {
-    marginBottom: 20,
-    marginTop: 10,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: "bold",
-    color: "#1e293b",
-    marginBottom: 10,
-  },
-  calendar: {
-    marginTop: 15,
-    backgroundColor: "#004AAD",
+    backgroundColor: "#f4f4f4",
+    borderBottomLeftRadius: 40,
+    borderBottomRightRadius: 40,
     padding: 20,
-    borderRadius: 8,
-    alignItems: "center",
-    justifyContent: "center",
   },
-  calendarText: {
-    color: "#64748b",
-    fontSize: 16,
+  bomdia: { fontSize: 16, color: "#000" },
+  usuario: { fontSize: 18, fontWeight: "bold", color: "#000" },
+  pergunta: {
+    fontSize: 20,
+    fontWeight: "medium",
+    marginVertical: 20,
+    paddingHorizontal: 20,
+  },
+  opcoes: {
+    flexDirection: "row",
+    justifyContent: "flex-start",
+    gap: 10,
+    paddingHorizontal: 20,
+  },
+  opcaoBtn: {
+    backgroundColor: "#ECECEC",
+    paddingVertical: 8,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+    borderColor: "#fff",
+    borderWidth: 5,
+    alignItems: "center"
+  },
+  dias: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    marginVertical: 20,
+  },
+  diaItem: {
+    borderWidth: 1,
+    borderColor: "#ccc",
+    borderRadius: 30,
+    padding: 10,
+    alignItems: "center",
+    width: 50,
+  },
+  diaSelecionado: {
+    borderColor: "black",
+  },
+  remediosHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 20,
+    marginBottom: 10,
+  },
+  sectionTitle: { fontSize: 18, fontWeight: "bold" },
+  cards: {
+    flexDirection: "row",
+    flexWrap: "wrap",
+    justifyContent: "space-between",
+    padding: 20,
   },
   card: {
-    backgroundColor: "#fff",
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 2,
-  },
-  cardTitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    color: "#1e293b",
-  },
-  cardSubtitle: {
-    fontSize: 14,
-    color: "#64748b",
-  },
-  logo: {
-    width: "60%",
-    height: "60%",
-    marginLeft: -10,
-  },
-  selectedDateText: {
-    marginTop: 10,
-    fontSize: 16,
-    color: "#1e293b",
-    fontWeight: "bold",
-  },
-  modalContainer: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  modalContent: {
-    width: "80%",
-    backgroundColor: "#fff",
-    borderRadius: 10,
-    padding: 20,
-    alignItems: "center",
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#1e293b",
-    marginBottom: 20,
-  },
-  input: {
-    width: "100%",
-    backgroundColor: "#e2e8f0",
-    padding: 15,
-    borderRadius: 8,
+    backgroundColor: "#f4f4f4",
+    borderRadius: 20,
+    width: "47%",
+    height: 150,
     marginBottom: 15,
-    color: "#1e293b",
-    fontSize: 16,
-  },
-  saveButton: {
-    backgroundColor: "#418cd3",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-  saveButtonText: {
-    color: "#fff",
-    fontWeight: "bold",
-  },
-  cancelButton: {
-    backgroundColor: "#e2e8f0",
-    paddingVertical: 10,
-    paddingHorizontal: 20,
-    borderRadius: 8,
-  },
-  cancelButtonText: {
-    color: "#1e293b",
-    fontWeight: "bold",
-  },
-  linearGradient: {
-    width: 50,
-    height: 50,
-    borderRadius: 10,
-    alignItems: "center",
-    flexDirection: "center",
     justifyContent: "center",
-    marginTop: "20%",
+    alignItems: "center",
+    padding: 10,
   },
-  noDataText: {
-    fontSize: 16,
-    color: "#64748b",
-    textAlign: "center",
-    marginTop: 10,
+  cardTitle: { fontSize: 16, fontWeight: "bold", marginTop: 8 },
+  cardSub: { fontSize: 12, textAlign: "center", color: "#555" },
+  bottomMenu: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    alignItems: "center",
+    paddingVertical: 12,
+    borderTopWidth: 1,
+    borderColor: "#eee",
+    backgroundColor: "#fff",
+    position: "absolute",
+    bottom: 0,
+    left: 0,
+    right: 0,
   },
+  menuItem: { alignItems: "center" },
+  menuItemAtivo: {
+    backgroundColor: "#2683ff",
+    padding: 12,
+    borderRadius: 30,
+    alignItems: "center",
+  },
+  menuAtivoText: { color: "white", fontSize: 12, marginTop: 2 },
 });

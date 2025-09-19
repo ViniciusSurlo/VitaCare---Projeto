@@ -3,6 +3,7 @@ import Landing from "./Landing";
 import Login from "./Login";
 import Medicamentos from "./Medicamentos";
 import Consultas from "./Consultas"
+import Cadastro from "./Cadastro";
 // import TelaInicial from "./TelaInicial"
 import Introducao from "./Introducao";
 
@@ -13,6 +14,7 @@ export default function MenuDrawer(){
         <Drawer.Navigator>
             {/* <Drawer.Screen name="TelaInicial" component={TelaInicial} /> */}
             <Drawer.Screen name="Introducao" component={Introducao} />
+            <Drawer.Screen name="Cadastro" component={Cadastro} />
             <Drawer.Screen name="Medicamentos" component={Medicamentos} />
             <Drawer.Screen name="Login" component={Login} />
             <Drawer.Screen name="Landing" component={Landing} />

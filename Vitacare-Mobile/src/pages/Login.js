@@ -50,7 +50,7 @@ const Login = () => {
         console.log("Login bem-sucedido:", dados);
         // Aqui você pode armazenar o token em um estado global ou AsyncStorage, se necessário
         AsyncStorage.setItem("UsuarioLogado", JSON.stringify(dados));
-        navigation.navigate("Landing");
+        navigation.navigate("MainTabs", { screen: "Home" });
       } else {
         throw new Error(dados.message || "Erro ao fazer login");
       }
@@ -63,7 +63,7 @@ const Login = () => {
 
   return (
     <View style={styles.container}>
-      <Text className='absolute top-8 left-6 z-10' onClick={() => navigation.goBack()}><MaterialCommunityIcons name='arrow-left' size={34} /></Text>
+      {/* <Text className='absolute top-8 left-6 z-10' onClick={() => navigation.goBack()}><MaterialCommunityIcons name='arrow-left' size={34} /></Text> */}
       {/* LOGIN */}
       <View style={styles.logincomp}>
         <Image source={require("../assets/logo1.png")} style={styles.logo} />
@@ -117,7 +117,7 @@ const Login = () => {
         <TouchableOpacity style={styles.button} onPress={handleLogin}>
           <Text style={styles.buttonText}>Entrar </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button2}>
+        <TouchableOpacity style={styles.button2} onPress={() => navigation.navigate("Cadastro")}>
           <Text style={styles.buttonText2}> Cadastre-se </Text>
         </TouchableOpacity>
       </View>
@@ -185,7 +185,7 @@ const styles = StyleSheet.create({
   buttonText2: {
     color: "#0049AB",
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: "thin",
   },
   footerText: {
     fontSize: 14,
