@@ -38,6 +38,17 @@ class RotasMedicamentos{
             res.status(500).json({ error: "Erro ao listar o medicamento" });
         }
     }
+
+    static async listarMedicamentosPorUsuario(req, res){
+        const { id_usuario } = req.params;
+        try {
+            const medicamentos = await BD.query(`SELECT * FROM Medicamentos WHERE id_usuario = $1 AND ativo = true`, [id_usuario]);
+            res.status(200).json(medicamentos.rows);
+        } catch (error) {
+            console.error("Erro ao listar os medicamentos do usuário:", error);
+            res.status(500).json({ error: "Erro ao listar os medicamentos do usuário" });
+        }
+    }
     
     static async DeletarMedicamentos(req, res){
         const {id_medicamento} = req.params 

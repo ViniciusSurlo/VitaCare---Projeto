@@ -32,6 +32,7 @@ app.delete('/usuarios/:id_usuario',autenticarToken, RotasUsuarios.deletarUsuario
 app.post('/medicamentos', RotasMedicamentos.novoMedicamento); //criar um novo medicamento
 app.get('/medicamentos', RotasMedicamentos.listarMedicamentos); //listar todos os medicamentos
 app.get('/medicamentos/:id_medicamento', RotasMedicamentos.listarMedicamentosPorId); //listar um medicamento por id
+app.get('/medicamentos/usuario/:id_usuario', RotasMedicamentos.listarMedicamentosPorUsuario); //listar medicamentos por id do usuario
 app.delete('/medicamentos/:id_medicamento', RotasMedicamentos.DeletarMedicamentos); //deletar um medicamento
 app.put('/medicamentos/:id_medicamento', RotasMedicamentos.AtualizarTodos); //atualizar todos os campos de um medicamento
 app.patch('/medicamentos/:id_medicamento', RotasMedicamentos.Atualizar); //atualizar campos especificos de um medicamento

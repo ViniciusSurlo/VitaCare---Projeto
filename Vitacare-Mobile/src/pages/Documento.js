@@ -14,9 +14,12 @@ import { Ionicons, MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import FontAwesome from '@expo/vector-icons/FontAwesome';
+import { useNavigation } from "@react-navigation/native";
 
 
 export default function Documento() {
+    const navigation = useNavigation();
+
     return(
         <View>
             <Text className='font-sans font-bold text-blue-400 flex justify-center items-center mt-6'>Selecione aqui o que deseja acessar</Text>

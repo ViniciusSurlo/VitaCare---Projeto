@@ -51,38 +51,39 @@ export default function Medicamentos({ navigation }) {
     setModalEditVisible(true);
   };
 
-  useEffect(() => {
-    const carregarRemedios = async () => {
-      try {
-        const resposta = await fetch(`${enderecoServidor}/medicamentos`);
-        const dados = await resposta.json();
-        if (resposta.ok) {
-          setRemedios(dados);
-        } else {
-          console.error("Erro ao carregar os remédios:", dados.error);
-        }
-      } catch (erro) {
-        console.error("Erro ao buscar os remédios:", erro);
+useEffect(() => {
+  const carregarRemedios = async () => {
+    try {
+      const resposta = await fetch(`${enderecoServidor}/medicamentos`);
+      const dados = await resposta.json();
+      if (resposta.ok) {
+        // garante que sempre será array
+        setRemedios(Array.isArray(dados) ? dados : []);
       }
-    };
-    carregarRemedios();
-  }, [atualizarRemedios]);
+    } catch (erro) {
+      console.error("Erro ao buscar os remédios:", erro);
+    }
+  };
 
-  useEffect(() => {
-    const carregarUsuario = async () => {
-      try {
-        const usuarioJSON = await AsyncStorage.getItem("UsuarioLogado");
-        if (usuarioJSON) {
-          const usuario = JSON.parse(usuarioJSON);
-          setIdUsuario(usuario.id_usuario);
-          setUsuario(usuario);
-        }
-      } catch (erro) {
-        console.error("Erro ao carregar usuário logado:", erro);
+  carregarRemedios();
+}, [atualizarRemedios]);
+
+useEffect(() => {
+  const carregarUsuario = async () => {
+    try {
+      const usuarioJSON = await AsyncStorage.getItem("UsuarioLogado");
+      if (usuarioJSON) {
+        const usuario = JSON.parse(usuarioJSON);
+        console.log("Usuario carregado:", usuario);
+        setIdUsuario(usuario.id_usuario);
+        setUsuario(usuario);
       }
-    };
-    carregarUsuario();
-  }, []);
+    } catch (erro) {
+      console.error("Erro ao carregar usuário logado:", erro);
+    }
+  };
+  carregarUsuario();
+}, []);
 
   const abrirModalAdd = () => {
     const hoje = new Date();

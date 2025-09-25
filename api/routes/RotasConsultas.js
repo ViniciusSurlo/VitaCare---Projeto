@@ -18,7 +18,7 @@ class RotasConsultas{
 
     static async ListarConsultas(req, res){
         try {
-            const consultas = await BD.query(`select u.nome, c.especialidade, c.data, c.hora, c.local, c.observacoes, c.horarios, c.ativo from consultas c 
+            const consultas = await BD.query(`select c.id_consulta, u.nome, c.especialidade, c.data, c.hora, c.local, c.observacoes, c.horarios, c.ativo from consultas c 
 	        join usuarios u on c.id_usuario = u.id_usuario`);
             res.status(200).json(consultas.rows);
         } catch (error) {

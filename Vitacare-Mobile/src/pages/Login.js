@@ -63,6 +63,14 @@ const Login = () => {
 
   return (
     <View style={styles.container}>
+      <TouchableOpacity 
+        style={{ position: "absolute", top: 70, left: 30, zIndex: 10 }}
+        onPress={() => navigation.goBack()}
+        >
+        <MaterialCommunityIcons name="arrow-left" size={34} color="" />
+      </TouchableOpacity>
+
+      
       {/* <Text className='absolute top-8 left-6 z-10' onClick={() => navigation.goBack()}><MaterialCommunityIcons name='arrow-left' size={34} /></Text> */}
       {/* LOGIN */}
       <View style={styles.logincomp}>

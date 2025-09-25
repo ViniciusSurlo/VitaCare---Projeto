@@ -10,6 +10,7 @@ import Medicamentos from "./src/pages/Medicamentos";
 import Consultas from "./src/pages/Consultas";
 import Cadastro from "./src/pages/Cadastro";
 import Documento from "./src/pages/Documento"; // <-- se ainda não existir, crie essa tela
+import Perfil from "./src/pages/Perfil";
 
 import "./global.css";
 
@@ -67,6 +68,11 @@ export default function App() {
         <Stack.Screen
           name="Cadastro"
           component={Cadastro}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen 
+          name='Perfil'
+          component={Perfil}
           options={{ headerShown: false }}
         />
 

@@ -7,63 +7,19 @@ import {
   ScrollView,
   Image,
 } from "react-native";
-import { Ionicons, MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import {
+  Ionicons,
+  MaterialCommunityIcons,
+  Entypo,
+} from "@expo/vector-icons";
 import { LinearGradient } from "expo-linear-gradient";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import FontAwesome5 from '@expo/vector-icons/FontAwesome5';
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-
+import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
+import MaterialIcons from "@expo/vector-icons/MaterialIcons";
 
 export default function Landing({ navigation }) {
-  // const navigation = useNavigation();
-
-  //estados para modal consulta
-  const [selectedDate, setSelectedDate] = useState("");
-  const [consulta, setConsulta] = useState("");
-  const [dbProvider, setDbProvider] = useState("supabase"); // ou "postgres"
-  const [remedios, setRemedios] = useState([]);
-
-  const [modalVisible, setModalVisible] = useState(false);
-  // Dados do Usuario
   const [usuario, setUsuario] = useState("");
   const [id_usuario, setIdUsuario] = useState("");
-
-  // configurações para o input com calendario
-  const [mostrarPicker, setMostrarPicker] = useState(false);
-  const [dataSelecionada, setDataSelecionada] = useState(new Date());
-
-  //estados para editar o remedio
-  const [modalEditarVisible, setModalEditarVisible] = useState(false);
-  const [remedioSelecionado, setRemedioSelecionado] = useState(null);
-
-  const onChange = (event, selectedDate) => {
-    setMostrarPicker(false);
-    if (selectedDate) {
-      setDataSelecionada(selectedDate);
-      const dataFormatada = selectedDate.toISOString().split("T")[0]; // Formato YYYY-MM-DD
-      setdata_inicio(dataFormatada);
-    }
-  };
-
-  useEffect(() => {
-    const carregarUsuario = async () => {
-      try {
-        const usuarioJSON = await AsyncStorage.getItem("UsuarioLogado");
-        if (usuarioJSON) {
-          const usuario = JSON.parse(usuarioJSON);
-          setUsuario(usuario.nome);
-          console.log(usuario);
-
-          setIdUsuario(usuario.id_usuario); // ou o nome correto da chave retornada
-        }
-      } catch (erro) {
-        console.error("Erro ao carregar usuário logado:", erro);
-      }
-    };
-
-    carregarUsuario();
-  }, []);
 
   const dias = [
     { dia: "Seg", num: "25" },
@@ -73,80 +29,70 @@ export default function Landing({ navigation }) {
     { dia: "Sex", num: "29" },
   ];
 
+  useEffect(() => {
+    const carregarUsuario = async () => {
+      try {
+        const usuarioJSON = await AsyncStorage.getItem("UsuarioLogado");
+        if (usuarioJSON) {
+          const usuario = JSON.parse(usuarioJSON);
+          setUsuario(usuario.nome);
+          setIdUsuario(usuario.id_usuario);
+        }
+      } catch (erro) {
+        console.error("Erro ao carregar usuário logado:", erro);
+      }
+    };
+
+    carregarUsuario();
+  }, []);
+
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={{ paddingBottom: 100 }}>
+        {/* Header */}
         <View style={styles.header}>
-          {/* Header da Header */}
-          <View
-            style={{
-              flexDirection: "row",
-              gap: 15,
-              padding: 20,
-              alignItems: "center",
-              justifyContent: "space-between",
-            }}
-          >
-            <View style={{display: "flex", flexDirection: "row", gap: 15, alignItems: "center"}}>
-              <View
-                style={{
-                  width: 60,
-                  height: 60,
-                  borderRadius: 30,
-                  overflow: "hidden",
-                  backgroundColor: "#fff",
-                  justifyContent: "center",
-                  alignItems: "center",
+          <View style={styles.headerTop}>
+            <View style={styles.headerUser}>
+              <Image
+                source={{
+                  uri: "https://i.pinimg.com/736x/61/8f/b1/618fb1a8cf308ceea61c5d1545e5fd7a.jpg",
                 }}
-              >
-                <Image
-                  source={{
-                    uri: "https://i.pinimg.com/736x/61/8f/b1/618fb1a8cf308ceea61c5d1545e5fd7a.jpg",
-                  }}
-                  style={{ width: 60, height: 60, borderRadius: 30 }}
-                  resizeMode="cover"
-                />
-              </View>
-
+                style={styles.avatar}
+                resizeMode="cover"
+              />
               <View>
                 <Text style={styles.bomdia}>Bom dia,</Text>
                 <Text style={styles.usuario}>{usuario}</Text>
               </View>
             </View>
-            
-            {/* Notificação */}
-            <TouchableOpacity
-              style={{
-                backgroundColor: "#fff",
-                padding: 4,
-                borderRadius: 10,
-                alignSelf: "flex-start",
-                borderBottomColor: "black",
-                
-              }}
-            >
-              <Ionicons name="notifications-outline" size={30} color="black" />
+
+            <TouchableOpacity style={styles.notificacao}>
+              <Ionicons name="notifications-outline" size={20} color="black" />
             </TouchableOpacity>
           </View>
 
-          <View>
-            {/* Pergunta */}
-            <Text style={styles.pergunta}>
-              Como você está se sentindo hoje?
-            </Text>
+          <Text style={styles.pergunta}>Como você está se sentindo hoje?</Text>
 
-            {/* Botões de opções */}
-            <View style={styles.opcoes}>
-              <TouchableOpacity style={styles.opcaoBtn}>
-                <Text> <FontAwesome5 name="clipboard-check" size={24} color="black" /> Checkup</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.opcaoBtn}>
-                <Text> <MaterialIcons name="health-and-safety" size={24} color="black" /> Remédios</Text>
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.opcaoBtn}>
-                <Text>IA</Text>
-              </TouchableOpacity>
-            </View>
+          <View style={styles.opcoes}>
+            <TouchableOpacity style={styles.opcaoBtn}>
+              <Text>
+                <FontAwesome5 name="clipboard-check" size={20} color="black" />{" "}
+                Checkup
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.opcaoBtn}>
+              <Text>
+                <MaterialIcons name="health-and-safety" size={20} color="black" />{" "}
+                Remédios
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.opcaoBtn}>
+              <Text>
+                <MaterialCommunityIcons name="robot" size={20} color="black" /> IA
+              </Text>
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -162,26 +108,71 @@ export default function Landing({ navigation }) {
             </View>
           ))}
         </View>
-      </ScrollView>
 
-      
+        {/* Cards de Menu */}
+        <View style={styles.cards}>
+          <TouchableOpacity style={styles.card} onPress={() => navigation.navigate("Medicamentos")}>
+            <FontAwesome5 name="pills" size={28} color="#0049AB" />
+            <Text style={styles.cardTitle}>Remédios</Text>
+            <Text style={styles.cardSub}>Veja aqui seus medicamentos</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.card}>
+            <MaterialCommunityIcons name="robot" size={28} color="#0049AB" />
+            <Text style={styles.cardTitle}>IACare</Text>
+            <Text style={styles.cardSub}>Converse com a IA</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.card}>
+            <Entypo name="folder" size={28} color="#0049AB" />
+            <Text style={styles.cardTitle}>Sei lá oq</Text>
+            <Text style={styles.cardSub}>Veja aqui seus sei lá o ques</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.card} onPress={() => navigation.navigate("Consultas")}>
+            <MaterialIcons name="event-available" size={28} color="#0049AB" />
+            <Text style={styles.cardTitle}>Consultas</Text>
+            <Text style={styles.cardSub}>Veja aqui suas consultas</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff" },
+
+  /* HEADER */
   header: {
     backgroundColor: "#f4f4f4",
     borderBottomLeftRadius: 40,
     borderBottomRightRadius: 40,
     padding: 20,
   },
+  headerTop: {
+    flexDirection: "row",
+    gap: 15,
+    padding: 10,
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  headerUser: {
+    flexDirection: "row",
+    gap: 15,
+    alignItems: "center",
+  },
+  avatar: { width: 60, height: 60, borderRadius: 30 },
   bomdia: { fontSize: 16, color: "#000" },
   usuario: { fontSize: 18, fontWeight: "bold", color: "#000" },
+  notificacao: {
+    backgroundColor: "#fff",
+    padding: 4,
+    borderRadius: 10,
+  },
   pergunta: {
     fontSize: 20,
-    fontWeight: "medium",
+    fontWeight: "500",
     marginVertical: 20,
     paddingHorizontal: 20,
   },
@@ -198,8 +189,11 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     borderColor: "#fff",
     borderWidth: 5,
-    alignItems: "center"
+    alignItems: "center",
+    justifyContent: "center",
   },
+
+  /* DIAS */
   dias: {
     flexDirection: "row",
     justifyContent: "space-around",
@@ -216,13 +210,8 @@ const styles = StyleSheet.create({
   diaSelecionado: {
     borderColor: "black",
   },
-  remediosHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    marginBottom: 10,
-  },
-  sectionTitle: { fontSize: 18, fontWeight: "bold" },
+
+  /* CARDS */
   cards: {
     flexDirection: "row",
     flexWrap: "wrap",
@@ -237,29 +226,18 @@ const styles = StyleSheet.create({
     marginBottom: 15,
     justifyContent: "center",
     alignItems: "center",
-    padding: 10,
+    padding: 15,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
-  cardTitle: { fontSize: 16, fontWeight: "bold", marginTop: 8 },
-  cardSub: { fontSize: 12, textAlign: "center", color: "#555" },
-  bottomMenu: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    paddingVertical: 12,
-    borderTopWidth: 1,
-    borderColor: "#eee",
-    backgroundColor: "#fff",
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
+  cardTitle: { fontSize: 16, fontWeight: "bold", marginTop: 10, color: "#000" },
+  cardSub: {
+    fontSize: 12,
+    textAlign: "center",
+    color: "#555",
+    marginTop: 4,
   },
-  menuItem: { alignItems: "center" },
-  menuItemAtivo: {
-    backgroundColor: "#2683ff",
-    padding: 12,
-    borderRadius: 30,
-    alignItems: "center",
-  },
-  menuAtivoText: { color: "white", fontSize: 12, marginTop: 2 },
 });
