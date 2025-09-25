@@ -72,11 +72,6 @@ O **VitaCare** oferece:
 ![TailwindCSS](https://img.shields.io/badge/TailwindCSS-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)
 ![Bootstrap](https://img.shields.io/badge/Bootstrap-563D7C?style=for-the-badge&logo=bootstrap&logoColor=white)
 
-- **Front-end:** ReactJS (ou outra tecnologia a definir)
-- **Back-end:** Node.js com Express
-- **Banco de Dados:** MySQL / PostgreSQL / MongoDB (definir conforme escolha do grupo)
-- **Notificações:** Push Notifications / E-mail Scheduler
-- **Estilização:** TailwindCSS / Bootstrap
 
 ### 📐 Padrão Arquitetural
 
