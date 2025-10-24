@@ -36,6 +36,7 @@ app.get('/medicamentos/usuario/:id_usuario', RotasMedicamentos.listarMedicamento
 app.delete('/medicamentos/:id_medicamento', RotasMedicamentos.DeletarMedicamentos); //deletar um medicamento
 app.put('/medicamentos/:id_medicamento', RotasMedicamentos.AtualizarTodos); //atualizar todos os campos de um medicamento
 app.patch('/medicamentos/:id_medicamento', RotasMedicamentos.Atualizar); //atualizar campos especificos de um medicamento
+app.get('/medicamentos/buscarDados/:id_usuario', RotasMedicamentos.buscarDados) //busca dados para a IA
 
 //rotas consultas
 app.post('/consultas', RotasConsultas.CriarConsulta); //criar uma nova consulta
@@ -44,6 +45,7 @@ app.get('/consultas/:id_consulta', RotasConsultas.ListarConsultasPorID); //lista
 app.delete('/consultas/:id_consulta', RotasConsultas.DeletarConsulta); //deletar uma consulta
 app.put('/consultas/:id_consulta', RotasConsultas.AtualizarTodos); //atualizar todos os campos de uma consulta
 app.patch('/consultas/:id_consulta', RotasConsultas.Atualizar); //atualizar campos especificos de uma consulta
+app.get('/consultas/usuario/:id_usuario',RotasConsultas.ListarConsultasPorUsuario)
 
 //rotas historicoConsultas
 app.post('/historicoConsultas', RotasHistoricoConsultas.CriarHistoricoConsulta); //criar um novo historico de consulta

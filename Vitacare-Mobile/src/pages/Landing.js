@@ -6,6 +6,8 @@ import {
   TouchableOpacity,
   ScrollView,
   Image,
+  Modal,
+  ActivityIndicator,
 } from "react-native";
 import {
   Ionicons,
@@ -15,12 +17,15 @@ import {
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import FontAwesome5 from "@expo/vector-icons/FontAwesome5";
 import MaterialIcons from "@expo/vector-icons/MaterialIcons";
+import { enderecoServidor } from "../utils";
 
 export default function Landing({ navigation }) {
   const [usuario, setUsuario] = useState("");
   const [id_usuario, setIdUsuario] = useState("");
-  const [medicamentos, setMedicamentos] = useState({})
-  const [consultas, setConsultas] = useState({})
+  const [dadosDashboard, setDadosDashboard] = useState({
+    medicamentos: [],
+    consultas: [],
+  });
 
   //variaveis de estado para analise com IA
   const [analise, setAnalise] = useState("");
@@ -28,53 +33,67 @@ export default function Landing({ navigation }) {
   const [erroAnalise, setErroAnalise] = useState(null);
   const [modalAnaliseAberto, setModalAnaliseAberto] = useState(false);
 
-  //fetch para os remedios da IA
+  //FETCH PRA BUSCAR DADOS PRA IA
+  //NÃO TA PASSANDO OS DADOS DE REMEDIOS E CONSULTAS
+  const buscarDadosIA = async () => {
+    try {
+      const resposta = await fetch(`${enderecoServidor}/medicamentos/buscarDados/${id_usuario}`, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${usuario.token}`,
+          "Content-Type": "application/json",
+        },
+      })
+        const dados = await resposta.json();
+        setDadosDashboard(dados);
+        console.log("Dados recebidos:", dados);
+    } catch (error) {
+      console.error("Erro ao buscar dados da API:", error);     
+    }
+  }
 
-  //fetch para as consultas da IA
-
-   //função do modal de analise com IA
+  //função do modal de analise com IA
+  // FALTA ESTILIZAR
   const ModalAnalise = () => (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-2xl p-8 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">
-            Análise com IA
-          </h2>
-          <button
-            onClick={() => setModalAnaliseAberto(false)}
+    <View >
+      <View>
+        <View>
+          <Text>
+            Análise Financeira com IA
+          </Text>
+          <TouchableOpacity
+            onPress={() => setModalAnaliseAberto(false)}
             className="text-gray-400 hover:text-gray-600 text-3xl"
           >
-            &times;
-          </button>
-        </div>
-        <div className="min-h-[200px]">
+          </TouchableOpacity>
+        </View>
+        <View>
           {carregandoAnalise && (
-            <div className="flex flex-col items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-              <p className="mt-4 text-gray-600">Analisando seus dados...</p>
-            </div>
+            <View >
+              <View></View>
+              <Text>Analisando suas finanças...</Text>
+            </View>
           )}
           {erroAnalise && (
-            <p className="text-red-700 bg-red-50 p-4 rounded-lg">
+            <Text>
               {erroAnalise}
-            </p>
+            </Text>
           )}
           {analise && (
-            <div className="prose max-w-none whitespace-pre-wrap text-gray-700 leading-relaxed">
+            <View>
               {analise}
-            </div>
+            </View>
           )}
-        </div>
-        <div className="flex justify-end mt-6 pt-4 border-t">
-          <button
-            onClick={() => setModalAnaliseAberto(false)}
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition"
+        </View>
+        <View>
+          <TouchableOpacity
+            onPress={() => setModalAnaliseAberto(false)}
           >
             Fechar
-          </button>
-        </div>
-      </div>
-    </div>
+          </TouchableOpacity>
+        </View>
+      </View>
+    </View>
   );
 
   //função para chamar API da OPENAI 
@@ -85,8 +104,29 @@ export default function Landing({ navigation }) {
     setModalAnaliseAberto(true)
 
     try {
+      buscarDadosIA();
       // criando o prompt de comando pra enviar por bichin
-      const prompt = `Você é um consultor pessoal de remédios`;
+      const prompt = `
+        Você é um consultor pessoal de saúde, especializado em orientar pacientes sobre o uso de medicamentos e consultas médicas.
+
+        Receberá dois conjuntos de dados em formato JSON: 
+        1. **Medicamentos** – contendo nome, horário, dose e observações.
+        2. **Consultas** – contendo especialidade, data, hora e local.
+
+        Com base nessas informações, gere uma análise resumida e útil, com no máximo **200 palavras**, abordando:
+        - Pontos de atenção (interações, horários próximos, possíveis esquecimentos).
+        - Sugestões de rotina saudável para organizar remédios e consultas.
+        - Lembretes práticos (ex: “levar o remédio X antes da consulta Y”).
+        - Um breve incentivo motivacional no final.
+
+        Evite termos técnicos complexos. Seja claro, empático e direto.
+
+        Abaixo estão os dados do usuário:
+        Medicamentos: ${JSON.stringify(dadosDashboard.medicamentos)}
+        Consultas: ${JSON.stringify(dadosDashboard.consultas)}
+
+        Agora, gere o texto da análise.
+      `
 
       //API key - é a chave secreta da OPENAI
       const apikey = '';
@@ -101,7 +141,7 @@ export default function Landing({ navigation }) {
           },
           body: JSON.stringify({
             model: 'gpt-4o-mini',
-            message: [{role: 'user', content: prompt}],
+            messages: [{role: 'user', content: prompt}],
             max_tokens: 300,
             temperature: 0.7,
           })
@@ -131,7 +171,7 @@ export default function Landing({ navigation }) {
         const usuarioJSON = await AsyncStorage.getItem("UsuarioLogado");
         if (usuarioJSON) {
           const usuario = JSON.parse(usuarioJSON);
-          setUsuario(usuario.nome);
+          setUsuario(usuario);
           setIdUsuario(usuario.id_usuario);
         }
       } catch (erro) {
@@ -161,7 +201,7 @@ export default function Landing({ navigation }) {
               />
               <View>
                 <Text style={styles.bomdia}>Bom dia,</Text>
-                <Text style={styles.usuario}>{usuario}.</Text>
+                <Text style={styles.usuario}>{usuario.nome}.</Text>
               </View>
             </TouchableOpacity>
 
@@ -183,7 +223,7 @@ export default function Landing({ navigation }) {
               <Text style={styles.opcaoTxt}>Remédios</Text>
             </TouchableOpacity>
 
-            <TouchableOpacity style={styles.opcaoBtn} onClick={analiseComIA}>
+            <TouchableOpacity style={styles.opcaoBtn} onPress={analiseComIA}>
               <MaterialCommunityIcons name="robot" size={18} color="#0049AB" />
               <Text style={styles.opcaoTxt}>IA</Text>
             </TouchableOpacity>
@@ -238,6 +278,10 @@ export default function Landing({ navigation }) {
             <Text style={styles.cardSub}>Veja aqui suas consultas</Text>
           </TouchableOpacity>
         </View>
+        {/* incluindo modal se variavel for true */}
+        {
+          modalAnaliseAberto == true ? <ModalAnalise /> : null
+        }
       </ScrollView>
     </View>
   );
@@ -346,4 +390,5 @@ const styles = StyleSheet.create({
     color: "#555",
     marginTop: 4,
   },
+  
 });

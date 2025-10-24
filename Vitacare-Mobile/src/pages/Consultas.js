@@ -37,12 +37,6 @@ export default function Consultas({ navigation }) {
   const [atualizarConsultas, setAtualizarConsultas] = useState(false);
   const [id_usuario, setIdUsuario] = useState();
 
-  useEffect(() => {
-    if (usuario && usuario.token) {
-      buscarDadosAPI();
-    }
-  }, [usuario]);
-
   const especialidades = [
     { nome: "Cardiologia", icon: <Ionicons name="heart-outline" size={28} color="#333" /> },
     { nome: "Pediatria", icon: <FontAwesome6 name="children" size={28} color="#333" /> },
@@ -70,7 +64,8 @@ export default function Consultas({ navigation }) {
         if (usuarioJSON) {
           const usuario = JSON.parse(usuarioJSON);
           setUsuario(usuario);
-          setIdUsuario(usuario.id_usuario);
+          const id = usuario.id_usuario          
+          setIdUsuario(id);
         }
       } catch (erro) {
         console.error("Erro ao carregar usuário logado:", erro);
@@ -81,7 +76,7 @@ export default function Consultas({ navigation }) {
 
   const buscarDadosAPI = async () => {
     try {
-      const resposta = await fetch(`${enderecoServidor}/consultas`, {
+      const resposta = await fetch(`${enderecoServidor}/consultas/usuario/${id_usuario}`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${usuario.token}`,
@@ -96,8 +91,10 @@ export default function Consultas({ navigation }) {
   };
 
   useEffect(() => {
-    buscarDadosAPI();
-  }, [atualizarConsultas]);
+    if (id_usuario) {
+      buscarDadosAPI();
+    }
+  }, [id_usuario, atualizarConsultas]);
 
   const adicionarConsulta = async () => {
     if (!especialidade || !data || !hora || !local) {
@@ -155,7 +152,7 @@ export default function Consultas({ navigation }) {
         <Text className="text-blue-500 text-xs">Horários</Text>
       </TouchableOpacity>
       <TouchableOpacity className="self-end mt-2" onPress={() => botaoExcluir(item.id_consulta)}>
-        <Ionicons name="trash" size={20} color="#ef4444" />
+        <Ionicons name="trash" size={20} color="#0065FB" />
       </TouchableOpacity>
     </View>
   );
@@ -181,7 +178,7 @@ export default function Consultas({ navigation }) {
 
       {/* imagem */}
       <View className="flex items-center justify-center">
-        <Image source={require("../assets/calendarinho.png")} style={{ height: 150, width: 150 }} />
+        <Image source={require("../assets/calendarinho.png")} style={{ height: 200, width: 200 }} />
       </View>
 
       <View className="items-center justify-center p-4 mt-4">

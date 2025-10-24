@@ -138,5 +138,36 @@ class RotasMedicamentos{
             })
         }
     }
+
+    static async buscarDados() {
+        try {
+            const {id_usuario} = req.params;
+
+            // query para buscar dados dos remedios do usuario
+            const queryMedicamentos = `
+                SELECT * from medicamentos WHERE id_usuario = $1 AND ativo = true
+            `
+
+            const queryConsultas = `
+                SELECT * FROM consultas WHERE id_usuario = $1 AND ativo = true
+            `
+
+            //executando as querys em paralelo
+            const [medicamentos, remedios] = 
+                await Promise.all([
+                    BD.query(queryMedicamentos),
+                    BD.query(queryConsultas)
+                ])
+
+            res.status(200).json({
+                medicamentos: medicamentos.rows,
+                remedios: remedios.rows
+            })
+
+        } catch (error) {
+            console.error("Erro ao listar dados:", error);
+            res.status(500).json({ error: "Erro ao listar dados" });
+        }
+    }
 }
 export default RotasMedicamentos; 

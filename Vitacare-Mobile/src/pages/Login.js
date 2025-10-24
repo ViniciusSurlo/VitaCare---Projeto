@@ -86,6 +86,7 @@ const Login = () => {
             value={email}
             onChangeText={setEmail}
             className="flex-1 justify-center text-lg items-center"
+            style={{color: "#000"}}
           />
           <MaterialCommunityIcons
             name="email"

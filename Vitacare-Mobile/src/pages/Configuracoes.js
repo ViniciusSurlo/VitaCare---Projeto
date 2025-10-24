@@ -1,156 +1,206 @@
-import React, { useState, useEffect } from "react";
-import {
-  View,
-  Image,
-  Text,
-  FlatList,
-  TouchableOpacity,
-  Modal,
-  TextInput,
-  Alert,
-  StyleSheet,
-} from "react-native";
-import { Ionicons, MaterialCommunityIcons, Entypo } from "@expo/vector-icons";
-import MaterialIcons from '@expo/vector-icons/MaterialIcons';
-import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
+import React from "react";
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, ImageBackground } from "react-native";
+import { Ionicons, MaterialIcons, FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-
+// Removida a importação de LinearGradient, pois usaremos ImageBackground
 
 export default function Configuracoes() {
-    const navigation = useNavigation();
+  const navigation = useNavigation();
 
-    return(
-        <View>
-            <Text className='font-sans font-bold text-blue-400 flex justify-center items-center mt-6'>Selecione aqui o que deseja acessar</Text>
-                {/* Seção Medicamentos */}
-            <View style={styles.remediosHeader} onPress={() => navigation.navigate("Medicamentos")}>
-                <TouchableOpacity>
-                    <Text style={{ color: "#2683ff" }}>+ Ver Mais</Text>
-                </TouchableOpacity>
-                </View>
-
-             {/* Cards */}
-             <View style={styles.cards}>
-            <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Configuracoes')}>
-                <FontAwesome6 name="gear" size={24} color="2b58de" />
-                <Text style={styles.cardTitle}>Configurações</Text>
-                <Text style={styles.cardSub}>Veja aqui as configurações</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Perfil')}>
-                <MaterialIcons name="account-box" size={24} color="#2b58de" />
-                <Text style={styles.cardTitle}>Perfil</Text>
-                <Text style={styles.cardSub}>Veja aqui seu perfil</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Historico')}>
-                <FontAwesome name="newspaper-o" size={24} color="#2b58de" />
-                <Text style={styles.cardTitle}>Histórico de consulta</Text>
-                <Text style={styles.cardSub}>Veja aqui seu histórico</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-                style={styles.card}
-                onPress={() => navigation.navigate("Notificacoes")}
-            >
-                <Entypo name="bell" size={24} color="#2b58de" />
-                <Text style={styles.cardTitle}>Notificações</Text>
-                <Text style={styles.cardSub}>Veja aqui suas notificações</Text>
-            </TouchableOpacity>
-            </View>
+  return (
+    <ScrollView style={styles.container}>
+    
+      {/* 1. USANDO O ESTILO DEFINIDO NO STYLESHEET AGORA */}
+      <ImageBackground
+        source={require('../assets/gradient.jpg')} 
+        style={styles.headerBackground} /* <--- NOVO ESTILO */         
+        resizeMode="cover"
+      >
+        <View style={styles.headerContent}> {/* <--- NOVO CONTAINER PARA CENTRALIZAR O CONTEÚDO */}
+          <View style={styles.avatar}>
+            <Text style={styles.avatarText}>MB</Text>
+          </View>
+          <Text style={styles.userName}>Mariana Borba</Text>
         </View>
-    )
+      </ImageBackground>
+
+
+      {/* Container das Opções do Menu */}
+      <View style={styles.menuContainer}>
+
+        {/* Botão Meu Perfil (Padrão) */}
+        <TouchableOpacity
+          style={[styles.menuButton, styles.menuButtonStandard]}
+          onPress={() => navigation.navigate('Perfil')}
+        >
+          <View style={styles.iconBackground}>
+            <FontAwesome name="user" size={22} color="#444" />
+          </View>
+          <Text style={styles.menuText}>Meu Perfil</Text>
+        </TouchableOpacity>
+
+        {/* Botão de Notificações (Destacado) */}
+        <TouchableOpacity 
+          style={styles.menuButton}
+          onPress={() => navigation.navigate("Notificacoes")}
+        >
+          {/* 3. SUBSTITUÍDO LINEARGRADIENT POR IMAGEBACKGROUND */}
+          <ImageBackground
+            source={require('../assets/gradient.jpg')} // <--- USANDO A MESMA IMAGEM
+            style={styles.menuButtonHighlighted}
+            resizeMode="contain"
+          >
+            <Ionicons name="notifications" size={24} color="white" style={styles.menuIcon} />
+            <Text style={styles.menuTextHighlighted}>Notificações</Text>
+            {/* Badge de Notificação */}
+            <View style={styles.badge}>
+              <Text style={styles.badgeText}>5</Text>
+            </View>
+          </ImageBackground>
+        </TouchableOpacity>
+
+        {/* Botão Histórico de Consultas (Padrão) */}
+        <TouchableOpacity
+          style={[styles.menuButton, styles.menuButtonStandard]}
+          onPress={() => navigation.navigate('Historico')}
+        >
+          <View style={styles.iconBackground}>
+            <MaterialIcons name="history" size={24} color="#444" />
+          </View>
+          <Text style={styles.menuText}>Histórico de Consultas</Text>
+        </TouchableOpacity>
+
+        {/* Botão Ajuda (Padrão) - Adicionado da imagem */}
+        <TouchableOpacity
+          style={[styles.menuButton, styles.menuButtonStandard]}
+          onPress={() => { /* Navegar para a tela de Ajuda, se existir */ }}
+        >
+          <View style={styles.iconBackground}>
+            <Ionicons name="help-circle" size={24} color="#444" />
+          </View>
+          <Text style={styles.menuText}>Ajuda</Text>
+        </TouchableOpacity>
+
+      </View>
+    </ScrollView>
+  );
 }
 
+// Estilos completamente novos baseados na imagem
 const styles = StyleSheet.create({
-container: { flex: 1, backgroundColor: "#fff" },
-  header: {
-    backgroundColor: "#f4f4f4",
-    borderBottomLeftRadius: 40,
-    borderBottomRightRadius: 40,
-    padding: 20,
+  container: {
+    flex: 1,
+    backgroundColor: '#f9f9f9', // Um fundo levemente cinza
   },
-  bomdia: { fontSize: 16, color: "#000" },
-  usuario: { fontSize: 18, fontWeight: "bold", color: "#000" },
-  pergunta: {
+  
+  /* NOVO ESTILO PARA O IMAGEBACKGROUND */
+  headerBackground: {
+    height: 154,
+    width: 352,
+    marginHorizontal: 20, /* Para dar espaço nas laterais */
+    marginTop: 20,
+    borderRadius: 16, /* <--- BORDAS ARREDONDADAS AQUI */
+    overflow: 'hidden', /* <--- ESSENCIAL PARA CORTAR A IMAGEM */
+  },
+  
+  /* NOVO ESTILO PARA ALINHAR O CONTEÚDO DENTRO DO IMAGEBACKGROUND */
+  headerContent: {
+    padding: 20,
+    paddingTop: 40, /* Ajustado o padding superior */
+    flexDirection: 'row',
+    alignItems: 'center',
+    // Opcional: Adicionar um leve sombreamento ou overlay aqui se necessário
+  },
+  
+  avatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'white',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
+  },
+  avatarText: {
+    color: '#005fba',
+    fontWeight: 'bold',
+    fontSize: 22,
+  },
+  userName: {
+    color: 'white',
     fontSize: 20,
-    fontWeight: "bold",
-    marginVertical: 20,
+    fontWeight: 'bold',
+  },
+  menuContainer: {
     paddingHorizontal: 20,
+    marginTop: 20, /* Ajuste para ter um pequeno espaço após o cabeçalho */
   },
-  opcoes: {
-    flexDirection: "row",
-    justifyContent: "flex-start",
-    gap: 10,
-    paddingHorizontal: 20,
+  menuButton: {
+    width: '100%',
+    borderRadius: 16,
+    marginBottom: 15,
+    overflow: 'hidden', // <--- ESSENCIAL PARA CORTAR O IMAGEBACKGROUND DO BOTÃO
+    // Sombra para dar elevação
+    shadowColor: "#000",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
-  opcaoBtn: {
-    backgroundColor: "#c3e3fd",
-    paddingVertical: 8,
-    paddingHorizontal: 15,
-    borderRadius: 20,
-  },
-  dias: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    marginVertical: 20,
-  },
-  diaItem: {
+  
+  menuButtonStandard: {
+    backgroundColor: 'white',
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 20,
     borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 30,
-    padding: 10,
-    alignItems: "center",
-    width: 50,
+    borderColor: '#e0e0e0',
   },
-  diaSelecionado: {
-    borderColor: "black",
-  },
-  remediosHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    marginBottom: 10,
-  },
-  sectionTitle: { fontSize: 18, fontWeight: "bold" },
-  cards: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    justifyContent: "space-between",
+  
+  menuButtonHighlighted: {
+    flexDirection: 'row',
+    alignItems: 'center',
     padding: 20,
   },
-  card: {
-    backgroundColor: "#f4f4f4",
+  
+  iconBackground: {
+    width: 40,
+    height: 40,
     borderRadius: 20,
-    width: "47%",
-    height: 150,
-    marginBottom: 15,
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 10,
+    backgroundColor: '#eeeeee',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 15,
   },
-  cardTitle: { fontSize: 16, fontWeight: "bold", marginTop: 8 },
-  cardSub: { fontSize: 12, textAlign: "center", color: "#555" },
-  bottomMenu: {
-    flexDirection: "row",
-    justifyContent: "space-around",
-    alignItems: "center",
-    paddingVertical: 12,
-    borderTopWidth: 1,
-    borderColor: "#eee",
-    backgroundColor: "#fff",
-    position: "absolute",
-    bottom: 0,
-    left: 0,
-    right: 0,
+  
+  menuIcon: {
+    marginRight: 15,
   },
-  menuItem: { alignItems: "center" },
-  menuItemAtivo: {
-    backgroundColor: "#2683ff",
-    padding: 12,
-    borderRadius: 30,
-    alignItems: "center",
+  menuText: {
+    fontSize: 16,
+    color: '#333',
+    fontWeight: '500',
   },
-  menuAtivoText: { color: "white", fontSize: 12, marginTop: 2 },
-})
+  menuTextHighlighted: {
+    fontSize: 16,
+    color: 'white',
+    fontWeight: 'bold',
+    flex: 1, // Faz o texto ocupar o espaço e empurra o badge para a direita
+  },
+  badge: {
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    backgroundColor: 'white', // Mudei para branco, como na imagem de referência
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  badgeText: {
+    color: '#005fba', // Cor do texto do badge para contrastar com o branco
+    fontWeight: 'bold',
+    fontSize: 12,
+  },
+});

@@ -6,17 +6,18 @@ import {
   StyleSheet,
   Modal,
   TextInput,
-  SafeAreaView, // Importado para melhor safe area
+  SafeAreaView,
 } from "react-native";
-import { Ionicons } from "@expo/vector-icons"; // Ícone de Seta, Add, Pessoa
+import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
-import { enderecoServidor } from "../utils"; // Importado do Perfil
-import AsyncStorage from "@react-native-async-storage/async-storage"; // Importado do Perfil
+import { enderecoServidor } from "../utils";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+
+const TIPOS_USUARIO = ["Admin", "Comum", "Editor"];
 
 export default function Perfil() {
   const navigation = useNavigation();
 
-  // --- Estados vindos do Perfil.js ---
   const [usuario, setUsuario] = useState({});
   const [dados, setDados] = useState({});
   const [modalEditarVisible, setModalEditarVisible] = useState(false);
@@ -24,7 +25,6 @@ export default function Perfil() {
   const [emailEdit, setEmailEdit] = useState("");
   const [tipoEdit, setTipoEdit] = useState("");
 
-  // --- Funções vindas do Perfil.js ---
   const abrirModalEditar = () => {
     setNomeEdit(dados.nome || "");
     setEmailEdit(dados.email || "");
@@ -71,7 +71,6 @@ export default function Perfil() {
   };
 
   const handleDeleteAccount = async () => {
-    // Confirmação antes de excluir
     if (confirm("Tem certeza que deseja excluir sua conta? Esta ação é irreversível.")) {
       try {
         await fetch(
@@ -92,7 +91,6 @@ export default function Perfil() {
     }
   };
 
-  // --- useEffect (lógica de carregar dados) vindo do Perfil.js ---
   useEffect(() => {
     const carregarUsuario = async () => {
       try {
@@ -100,7 +98,6 @@ export default function Perfil() {
         if (usuarioJSON) {
           const usuario = JSON.parse(usuarioJSON);
           setUsuario(usuario);
-          // Busca os dados completos do usuário
           const resposta = await fetch(
             `${enderecoServidor}/usuarios/${usuario.id_usuario}`,
             {
@@ -122,10 +119,8 @@ export default function Perfil() {
   }, []);
 
   return (
-    // SafeAreaView para garantir que o conteúdo não fique sob a status bar
     <SafeAreaView style={styles.safeContainer}>
       <View style={styles.container}>
-        {/* --- Modal de Edição (Estilo antigo mantido) --- */}
         <Modal
           visible={modalEditarVisible}
           animationType="slide"
@@ -135,14 +130,14 @@ export default function Perfil() {
           <View style={styles.modalOverlay}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Editar Usuário</Text>
-              
+
               <Text style={styles.inputLabel}>Nome</Text>
               <TextInput
                 style={styles.textInput}
                 value={nomeEdit}
                 onChangeText={setNomeEdit}
               />
-              
+
               <Text style={styles.inputLabel}>Email</Text>
               <TextInput
                 style={styles.textInput}
@@ -151,14 +146,30 @@ export default function Perfil() {
                 keyboardType="email-address"
                 autoCapitalize="none"
               />
-              
+
               <Text style={styles.inputLabel}>Tipo de Usuário</Text>
-              <TextInput
-                style={styles.textInput}
-                value={tipoEdit}
-                onChangeText={setTipoEdit}
-              />
-              
+              <View style={styles.tipoUsuarioContainer}>
+                {TIPOS_USUARIO.map((tipo) => (
+                  <TouchableOpacity
+                    key={tipo}
+                    style={[
+                      styles.tipoUsuarioButton,
+                      tipoEdit === tipo && styles.tipoUsuarioButtonSelected,
+                    ]}
+                    onPress={() => setTipoEdit(tipo)}
+                  >
+                    <Text
+                      style={[
+                        styles.tipoUsuarioText,
+                        tipoEdit === tipo && styles.tipoUsuarioTextSelected,
+                      ]}
+                    >
+                      {tipo}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
               <View style={styles.modalButtonRow}>
                 <TouchableOpacity
                   style={[styles.modalButton, styles.modalButtonSave]}
@@ -177,7 +188,6 @@ export default function Perfil() {
           </View>
         </Modal>
 
-        {/* Header */}
         <View style={styles.header}>
           <TouchableOpacity
             style={styles.headerButton}
@@ -190,26 +200,21 @@ export default function Perfil() {
             style={styles.headerButton}
             onPress={abrirModalEditar}
           >
-            <Ionicons name="edit" size={24} color="#444" />
+            <Ionicons name="pencil" size={24} color="#444" />
           </TouchableOpacity>
         </View>
 
-        {/* Foto de Perfil */}
         <View style={styles.profileCircle}>
-          
+          <Ionicons name="person" size={70} color="#007AFF" />
         </View>
 
-        {/* Fundo cinza claro arredondado */}
         <View style={styles.contentSheet}>
-          {/* Nome e Email */}
           <View style={styles.infoContainer}>
             <Text style={styles.nameText}>{dados.nome || "Carregando..."}</Text>
             <Text style={styles.emailText}>{dados.email || "Carregando..."}</Text>
           </View>
 
-          {/* Bloco de Ações */}
           <View style={styles.actionBox}>
-            {/* Linha de Status */}
             <View style={styles.statusRow}>
               <View style={styles.statusGroup}>
                 <Text style={styles.statusText}>
@@ -221,22 +226,14 @@ export default function Perfil() {
                 <Text style={styles.statusText}>
                   {dados.ativo ? "Ativo" : "Inativo"}
                 </Text>
-                <View 
+                <View
                   style={[
-                    styles.activeDot, 
-                    { backgroundColor: dados.ativo ? '#34C759' : '#FF3B30' } // Verde se ativo, Vermelho se inativo
-                  ]} 
+                    styles.activeDot,
+                    { backgroundColor: dados.ativo ? '#34C759' : '#FF3B30' }
+                  ]}
                 />
               </View>
             </View>
-
-            {/* Botões de Ação */}
-            <TouchableOpacity
-              style={[styles.button, styles.editButton]}
-              onPress={abrirModalEditar}
-            >
-              <Text style={styles.buttonText}>Editar Usuário</Text>
-            </TouchableOpacity>
 
             <TouchableOpacity
               style={[styles.button, styles.deleteButton]}
@@ -244,14 +241,13 @@ export default function Perfil() {
             >
               <Text style={styles.buttonText}>Excluir Usuário</Text>
             </TouchableOpacity>
-            
+
             <TouchableOpacity
               style={[styles.button, styles.logoutButton]}
               onPress={handleLogout}
             >
               <Text style={styles.buttonText}>Sair</Text>
             </TouchableOpacity>
-
           </View>
         </View>
       </View>
@@ -259,7 +255,6 @@ export default function Perfil() {
   );
 }
 
-// --- Novos Estilos (Baseados na Imagem) ---
 const styles = StyleSheet.create({
   safeContainer: {
     flex: 1,
@@ -298,7 +293,7 @@ const styles = StyleSheet.create({
     borderRadius: 75,
     backgroundColor: "#F0F0F0",
     borderWidth: 2,
-    borderColor: "#007AFF", // Azul da imagem
+    borderColor: "#007AFF",
     alignSelf: "center",
     marginTop: 20,
     justifyContent: "center",
@@ -343,8 +338,8 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 25, // Mais espaço antes dos botões
-    paddingHorizontal: 10, // Pequeno padding interno
+    marginBottom: 25,
+    paddingHorizontal: 10,
   },
   statusGroup: {
     flexDirection: "row",
@@ -360,18 +355,17 @@ const styles = StyleSheet.create({
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: "#007AFF", // Azul
+    backgroundColor: "#007AFF",
   },
   activeDot: {
     width: 14,
     height: 14,
     borderRadius: 7,
-    // A cor é definida dinamicamente no componente
   },
   button: {
     width: "100%",
     paddingVertical: 15,
-    borderRadius: 15, // Mais arredondado
+    borderRadius: 15,
     alignItems: "center",
     marginBottom: 12,
   },
@@ -381,16 +375,15 @@ const styles = StyleSheet.create({
     fontWeight: "600",
   },
   editButton: {
-    backgroundColor: "#007AFF", // Azul
+    backgroundColor: "#007AFF",
   },
   deleteButton: {
-    backgroundColor: "#007AFF", // Azul (como na imagem)
+    backgroundColor: "#007AFF",
   },
   logoutButton: {
-    backgroundColor: "#FF3B30", // Vermelho (padrão iOS para destrutivo)
+    backgroundColor: "#bfbfbf",
   },
 
-  // --- Estilos do Modal (Mantidos do código anterior) ---
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
@@ -426,6 +419,7 @@ const styles = StyleSheet.create({
   modalButtonRow: {
     flexDirection: "row",
     justifyContent: "space-between",
+    marginTop: 20,
   },
   modalButton: {
     borderRadius: 12,
@@ -446,5 +440,39 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     fontSize: 16,
+  },
+  // NOVOS ESTILOS AJUSTADOS PARA OCUPAR MENOS ESPAÇO E ESTAR NA MESMA LINHA
+  tipoUsuarioContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between", // Distribui o espaço entre os botões
+    marginBottom: 12,
+    flexWrap: "wrap", // Garante responsividade quebrando a linha se necessário (embora TIPOS_USUARIO tenha apenas 3)
+  },
+  tipoUsuarioButton: {
+    flex: 1, // Permite que o botão se expanda para ocupar o espaço disponível
+    minWidth: 80, // Garante um tamanho mínimo para visualização
+    paddingVertical: 8,
+    paddingHorizontal: 5, // Reduzido o padding horizontal
+    borderRadius: 15, // Mais arredondado, visualmente menor
+    borderWidth: 1,
+    borderColor: "#ccc",
+    marginHorizontal: 3, // Reduzido o margin
+    backgroundColor: "#f9f9f9",
+    alignItems: "center", // Centraliza o texto
+  },
+  tipoUsuarioButtonSelected: {
+    borderColor: "#2563eb",
+    backgroundColor: "#e0f2fe",
+    borderWidth: 2,
+  },
+  tipoUsuarioText: {
+    fontSize: 13, // Reduzido o tamanho da fonte
+    color: "#444",
+    fontWeight: "500",
+    textAlign: 'center',
+  },
+  tipoUsuarioTextSelected: {
+    color: "#1d4ed8",
+    fontWeight: "bold",
   },
 });
