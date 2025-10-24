@@ -1,4 +1,4 @@
-import { BD } from "../Db.js";
+import { BD } from "../db.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -47,7 +47,7 @@ class RotasUsuarios {
     static async login(req,res){
         const { email, senha } = req.body;
         try {
-            const usuario = await BD.query(`SELECT * FROM Usuarios WHERE email = $1 and ativo = true`, [email]);
+            const usuario = await BD.query(`SELECT * FROM usuarios WHERE email = $1 and ativo = true`, [email]);
             if (usuario.rows.length === 0) {
                 return res.status(401).json({ error: "Usuário não encontrado" });
             }

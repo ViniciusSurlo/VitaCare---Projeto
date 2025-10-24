@@ -31,7 +31,7 @@ const Login = () => {
     try {
       if (email === "" || senha === "") {
         throw new Error("Preencha todos os campos");
-      }
+      }      
       //autenticando utilizando a API de backend com o fetch e recebendo o token
       const resposta = await fetch(`${enderecoServidor}/usuarios/login`, {
         method: "POST",
@@ -45,7 +45,6 @@ const Login = () => {
       });
       const dados = await resposta.json();
       console.log("DADOS COMPLETOS", dados);
-
       if (resposta.ok) {
         console.log("Login bem-sucedido:", dados);
         // Aqui você pode armazenar o token em um estado global ou AsyncStorage, se necessário

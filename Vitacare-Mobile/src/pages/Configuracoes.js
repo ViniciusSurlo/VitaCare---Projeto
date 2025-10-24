@@ -17,7 +17,7 @@ import FontAwesome from '@expo/vector-icons/FontAwesome';
 import { useNavigation } from "@react-navigation/native";
 
 
-export default function Documento() {
+export default function Configuracoes() {
     const navigation = useNavigation();
 
     return(

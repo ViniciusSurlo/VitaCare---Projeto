@@ -42,7 +42,7 @@ class RotasMedicamentos{
     static async listarMedicamentosPorUsuario(req, res){
         const { id_usuario } = req.params;
         try {
-            const medicamentos = await BD.query(`SELECT * FROM Medicamentos WHERE id_usuario = $1 AND ativo = true`, [id_usuario]);
+            const medicamentos = await BD.query(`SELECT * FROM medicamentos WHERE id_usuario = $1 AND ativo = true`, [id_usuario]);  
             res.status(200).json(medicamentos.rows);
         } catch (error) {
             console.error("Erro ao listar os medicamentos do usuário:", error);

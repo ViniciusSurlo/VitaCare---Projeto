@@ -8,6 +8,7 @@ import {
   Modal,
   TextInput,
   Alert,
+  ScrollView
 } from "react-native";
 import { enderecoServidor } from "../utils.js";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -48,10 +49,6 @@ export default function Consultas({ navigation }) {
     { nome: "Ginecologia", icon: <MaterialCommunityIcons name="gender-female" size={28} color="#333" /> },
     { nome: "Dermatologia", icon: <MaterialCommunityIcons name="face-man-outline" size={28} color="#333" /> },
     { nome: "Ortopedia", icon: <Ionicons name="walk-outline" size={28} color="#333" /> },
-    { nome: "Neurologia", icon: <FontAwesome5 name="brain" size={28} color="#333" /> },
-    { nome: "Cirurgia", icon: <Fontisto name="injection-syringe" size={28} color="#333" /> },
-    { nome: "Geriatria", icon: <MaterialIcons name="elderly" size={28} color="#333" /> },
-    { nome: "Psiquiatria", icon: <MaterialCommunityIcons name="brain" size={28} color="#333" /> },
     { nome: "Outro", icon: <Feather name="more-horizontal" size={28} color="#333" /> },
   ];
 
@@ -157,7 +154,7 @@ export default function Consultas({ navigation }) {
         <View className="w-2 h-2 rounded-full bg-blue-500 mr-1" />
         <Text className="text-blue-500 text-xs">Horários</Text>
       </TouchableOpacity>
-      <TouchableOpacity className="self-end mt-2" onPress={() => botaoExcluir(item.id)}>
+      <TouchableOpacity className="self-end mt-2" onPress={() => botaoExcluir(item.id_consulta)}>
         <Ionicons name="trash" size={20} color="#ef4444" />
       </TouchableOpacity>
     </View>
@@ -202,7 +199,9 @@ export default function Consultas({ navigation }) {
       />
 
       {/* Modal principal */}
+      
       <Modal visible={modalAddVisible} animationType="slide" transparent={true} onRequestClose={() => setModalAddVisible(false)}>
+        <ScrollView>
         <View className="flex-1 justify-center items-center bg-black/60">
           <View className="bg-white rounded-2xl p-6 w-11/12 max-w-md">
             <Text className="text-xl font-bold text-blue-700 mb-4">Adicionar Consulta</Text>
@@ -275,6 +274,7 @@ export default function Consultas({ navigation }) {
             </View>
           </View>
         </View>
+        </ScrollView>
       </Modal>
 
       {/* Modal Outro */}

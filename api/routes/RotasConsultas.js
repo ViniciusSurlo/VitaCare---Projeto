@@ -32,13 +32,22 @@ class RotasConsultas{
         try {
             const consulta = await BD.query(`select u.nome, c.especialidade, c.data, c.hora, c.local, c.observacoes, c.horarios, c.ativo from consultas c 
 	        join usuarios u on c.id_usuario = u.id_usuario WHERE id_consulta = $1`, [id_consulta]);
-            if (consulta.rows.length === 0) {
-                return res.status(404).json({ error: "Consulta não encontrada" });
-            }
             res.status(200).json(consulta.rows[0]);
         } catch (error) {
             console.error("Erro ao listar a consulta:", error);
             res.status(500).json({ error: "Erro ao listar a consulta" });
+        }
+    }
+
+    static async ListarConsultasPorUsuario(req, res){
+        const {id_usuario} = req.params
+        try {
+            const consultas = await BD.query(`select c.id_consulta, u.nome, c.especialidade, c.data, c.hora, c.local, c.observacoes, c.horarios, c.ativo from consultas c 
+            join usuarios u on c.id_usuario = u.id_usuario WHERE c.id_usuario = $1`, [id_usuario]);
+            res.status(200).json(consultas.rows);
+        } catch (error) {
+            console.error("Erro ao listar as consultas do usuário:", error);
+            res.status(500).json({ error: "Erro ao listar as consultas do usuário" });
         }
     }
 

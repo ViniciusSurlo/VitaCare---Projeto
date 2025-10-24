@@ -9,7 +9,7 @@ import Introducao from "./src/pages/Introducao";
 import Medicamentos from "./src/pages/Medicamentos";
 import Consultas from "./src/pages/Consultas";
 import Cadastro from "./src/pages/Cadastro";
-import Documento from "./src/pages/Documento"; // <-- se ainda não existir, crie essa tela
+import Configuracoes from "./src/pages/Configuracoes"; // <-- se ainda não existir, crie essa tela
 import Perfil from "./src/pages/Perfil";
 
 import "./global.css";
@@ -26,10 +26,10 @@ function MainTabs() {
         tabBarIcon: ({ color, size }) => {
           let iconName;
 
-          if (route.name === "Home") iconName = "home";
+          if (route.name === "Home") iconName = "home-outline";
           else if (route.name === "Consultas") iconName = "calendar-outline";
           else if (route.name === "Medicamentos") iconName = "medkit-outline";
-          else if (route.name === "Documento") iconName = "person-outline";
+          else if (route.name === "Configuracoes") iconName = "settings-outline";
 
           return <Ionicons name={iconName} size={size} color={color} />;
         },
@@ -46,7 +46,7 @@ function MainTabs() {
       <Tab.Screen name="Home" component={Landing} />
       <Tab.Screen name="Consultas" component={Consultas} />
       <Tab.Screen name="Medicamentos" component={Medicamentos} />
-      <Tab.Screen name="Documento" component={Documento} />
+      <Tab.Screen name="Configuracoes" component={Configuracoes} />
     </Tab.Navigator>
   );
 }

@@ -51,10 +51,27 @@ export default function Medicamentos({ navigation }) {
     setModalEditVisible(true);
   };
 
+  useEffect(() => {
+  const carregarUsuario = async () => {
+    try {
+      const usuarioJSON = await AsyncStorage.getItem("UsuarioLogado");
+      if (usuarioJSON) {
+        const usuario = JSON.parse(usuarioJSON);
+        const id = usuario.id_usuario
+        setIdUsuario(id);
+      }
+    } catch (erro) {
+      console.error("Erro ao carregar usuário logado:", erro);
+    }
+  };
+  carregarUsuario();
+}, []);
+
 useEffect(() => {
   const carregarRemedios = async () => {
-    try {
-      const resposta = await fetch(`${enderecoServidor}/medicamentos`);
+    try { 
+      if (!id_usuario) return;
+      const resposta = await fetch(`${enderecoServidor}/medicamentos/usuario/${id_usuario}`);
       const dados = await resposta.json();
       if (resposta.ok) {
         // garante que sempre será array
@@ -66,24 +83,7 @@ useEffect(() => {
   };
 
   carregarRemedios();
-}, [atualizarRemedios]);
-
-useEffect(() => {
-  const carregarUsuario = async () => {
-    try {
-      const usuarioJSON = await AsyncStorage.getItem("UsuarioLogado");
-      if (usuarioJSON) {
-        const usuario = JSON.parse(usuarioJSON);
-        console.log("Usuario carregado:", usuario);
-        setIdUsuario(usuario.id_usuario);
-        setUsuario(usuario);
-      }
-    } catch (erro) {
-      console.error("Erro ao carregar usuário logado:", erro);
-    }
-  };
-  carregarUsuario();
-}, []);
+}, [id_usuario, atualizarRemedios]);
 
   const abrirModalAdd = () => {
     const hoje = new Date();
