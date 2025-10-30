@@ -6,10 +6,10 @@ import {
   Image,
   TextInput,
 } from "react-native";
+import { Feather } from "@expo/vector-icons";
 
 import { useState, useEffect } from "react";
 import { useNavigation } from "@react-navigation/native";
-// import { LinearGradient } from "expo-linear-gradient";
 import AntDesign from "@expo/vector-icons/AntDesign";
 import { enderecoServidor } from "../utils";
 import { Alert } from "react-native";
@@ -32,7 +32,6 @@ const Login = () => {
       if (email === "" || senha === "") {
         throw new Error("Preencha todos os campos");
       }      
-      //autenticando utilizando a API de backend com o fetch e recebendo o token
       const resposta = await fetch(`${enderecoServidor}/usuarios/login`, {
         method: "POST",
         headers: {
@@ -46,13 +45,24 @@ const Login = () => {
       const dados = await resposta.json();
       console.log("DADOS COMPLETOS", dados);
       if (resposta.ok) {
-        console.log("Login bem-sucedido:", dados);
-        // Aqui você pode armazenar o token em um estado global ou AsyncStorage, se necessário
-        AsyncStorage.setItem("UsuarioLogado", JSON.stringify(dados));
-        navigation.navigate("MainTabs", { screen: "Home" });
+      console.log("Login bem-sucedido:", dados);
+
+      // Sempre salva os dados do usuário
+      await AsyncStorage.setItem("UsuarioLogado", JSON.stringify(dados));
+
+      // Mas se não quiser lembrar, marca um flag temporário
+      if (!lembrar) {
+        await AsyncStorage.setItem("NaoLembrar", "true");
       } else {
-        throw new Error(dados.message || "Erro ao fazer login");
+        await AsyncStorage.removeItem("NaoLembrar");
       }
+
+      // Navega para Home passando os dados do usuário
+      navigation.navigate("MainTabs", { 
+        screen: "Home",
+        params: { usuarioLogado: dados } 
+      });
+}
     } catch (error) {
       console.error("Erro ao realizar login:", error);
       alert(error.message);
@@ -60,76 +70,122 @@ const Login = () => {
     }
   };
 
+  useEffect(() => {
+    const verificarLogin = async () => {
+      try {
+        const usuarioSalvo = await AsyncStorage.getItem("UsuarioLogado");
+        const naoLembrar = await AsyncStorage.getItem("NaoLembrar");
+
+        if (usuarioSalvo && !naoLembrar) {
+          // 👉 em vez de MainTabs, leve direto pra Landing
+          const dados = JSON.parse(usuarioSalvo);
+        navigation.navigate("MainTabs", {
+          screen: "Home",
+          params: { usuarioLogado: dados },
+        });
+        } else {
+          await AsyncStorage.removeItem("UsuarioLogado");
+          await AsyncStorage.removeItem("NaoLembrar");
+        }
+      } catch (err) {
+        console.error("Erro ao verificar login:", err);
+      }
+    };
+
+    verificarLogin();
+  }, []);
+
   return (
     <View style={styles.container}>
-      <TouchableOpacity 
-        style={{ position: "absolute", top: 70, left: 30, zIndex: 10 }}
-        onPress={() => navigation.goBack()}
-        >
-        <MaterialCommunityIcons name="arrow-left" size={34} color="" />
-      </TouchableOpacity>
-
       
-      {/* <Text className='absolute top-8 left-6 z-10' onClick={() => navigation.goBack()}><MaterialCommunityIcons name='arrow-left' size={34} /></Text> */}
-      {/* LOGIN */}
+        <Image 
+        source={require("../assets/loginCima.png")}
+        style={styles.imagemTopo}
+        resizeMode="cover"
+        />
+     
+
       <View style={styles.logincomp}>
         <Image source={require("../assets/logo1.png")} style={styles.logo} />
         <Text style={styles.subtitle}>
-          O jeito <Text className="text-blue-800">inteligente</Text> de cuidar
-          de você
+          O jeito <Text style={styles.inteligente}>inteligente</Text> de cuidar de você
         </Text>
-        {/* email */}
-        <View style={styles.inputView} className="flex-row items-center">
+
+        <TextInput
+          style={styles.input}
+          placeholder="Email"
+          placeholderTextColor="rgba(0, 73, 171, 0.5)"
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+
+        <View style={styles.inputSenha}>
           <TextInput
-            placeholder="Email"
-            placeholderTextColor="#aaa"
-            value={email}
-            onChangeText={setEmail}
-            className="flex-1 justify-center text-lg items-center"
-            style={{color: "#000"}}
-          />
-          <MaterialCommunityIcons
-            name="email"
-            size={24}
-            color="#aaa"
-            className="text-center items-center justify-center"
-          />
-        </View>
-        {/* senha */}
-        <View style={styles.inputView} className="flex-row items-center">
-          <TextInput
+            style={styles.inputTextSenha}
             placeholder="Senha"
-            placeholderTextColor="#aaa"
+            placeholderTextColor="rgba(0, 73, 171, 0.5)"
             value={senha}
             onChangeText={setSenha}
             secureTextEntry={!mostrarSenha}
-            className="flex-1 justify-center text-lg"
           />
-
           <TouchableOpacity onPress={() => setMostrarSenha(!mostrarSenha)}>
-          <Entypo
-            name={mostrarSenha ? "eye" : "eye-with-line"}
-            size={24}
-            color="#aaa"
-            className="text-center items-center justify-center"
-          />
+            <Entypo
+              name={mostrarSenha ? "eye" : "eye-with-line"}
+              size={22}
+              color="#0049AB"
+            />
           </TouchableOpacity>
         </View>
-        {/* <TextInput
-                style={styles.input}
-                placeholder="Tipo de Usuário"
-                placeholderTextColor="#aaa"
-                value={tipo_usuario}
-                onChangeText={setTipoUsuario}
-            /> */}
-        <TouchableOpacity style={styles.button} onPress={handleLogin}>
-          <Text style={styles.buttonText}>Entrar </Text>
+
+        <TouchableOpacity 
+          style={styles.lembrarContainer} 
+          onPress={() => setLembrar(!lembrar)}
+        >
+          <MaterialCommunityIcons 
+            name={lembrar ? "checkbox-marked" : "checkbox-blank-outline"} 
+            size={20} 
+            color="#0049AB" 
+          />
+          <Text style={styles.lembrarText}>Lembrar de mim</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.button2} onPress={() => navigation.navigate("Cadastro")}>
-          <Text style={styles.buttonText2}> Cadastre-se </Text>
+
+        <TouchableOpacity>
+          <Text style={styles.forgotPassword}>Esqueci minha senha</Text>
+        </TouchableOpacity>
+
+        {/* Botões */}
+      <View className="flex flex-row justify-center items-center">
+        <TouchableOpacity
+          className="border-4 flex flex-row border-white bg-gray-100 rounded-full w-40 h-12 justify-center items-center space-x-2"
+          onPress={() => navigation.goBack()}
+        >
+          <Text className="text-black text-lg font-sans">Voltar</Text>
+          <View className="h-8 w-8 bg-white rounded-full flex justify-center items-center">
+            <Feather name="arrow-up-left" size={24} color="black" />
+          </View>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          className="border-4 flex flex-row border-white bg-gray-100 rounded-full w-40 h-12 justify-center items-center space-x-2"
+          onPress={handleLogin} 
+        >
+          <Text className="text-black text-lg font-sans">Entrar</Text>
+          <View className="h-8 w-8 bg-blue-600 rounded-full flex justify-center items-center">
+            <Feather name="arrow-up-right" size={24} color="white" />
+          </View>
         </TouchableOpacity>
       </View>
-      {/* FIM */}
+
+
+      </View>
+
+      <Image 
+        source={require("../assets/logo1.png")} 
+        style={styles.logoFooter} 
+        resizeMode="contain"
+      />
     </View>
   );
 };
@@ -137,101 +193,134 @@ const Login = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffff",
+    backgroundColor: "#fff",
     alignItems: "center",
-    justifyContent: "center",
-    padding: 20,
-  },
-  logo: {
-    width: 350,
-    height: 100,
-    borderRadius: 10,
-  },
-
-  subtitle: {
-    fontSize: 16,
-    fontWeight: "bold",
-    marginBottom: 30,
-    textAlign: "center",
-  },
-  inputView: {
-    width: 350,
-    height: 50,
-    backgroundColor: "#ffff",
-    padding: 15,
-    borderRadius: 50,
-    marginBottom: 15,
-    fontSize: 16,
-    borderColor: "#C9C9C9",
-    borderWidth: 2.8,
-    flexDirection: "row",
     justifyContent: "space-between",
+    paddingVertical: 40,
   },
-  button: {
-    backgroundColor: "#0049AB",
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 25,
-    width: "100%",
-    alignItems: "center",
-    marginBottom: 20,
+  lembrarContainer: {
+  flexDirection: "row",
+  alignItems: "center",
+  marginBottom: 20,
   },
-  buttonText: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
+  lembrarText: {
+  color: "#0049AB",
+  fontSize: 14,
+  marginLeft: 8,
   },
-  button2: {
-    backgroundColor: "#BED0FF",
-    paddingVertical: 15,
-    paddingHorizontal: 20,
-    borderRadius: 25,
-    width: "100%",
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  buttonText2: {
-    color: "#0049AB",
-    fontSize: 18,
-    fontWeight: "thin",
-  },
-  footerText: {
-    fontSize: 14,
-    color: "#94a3b8",
-    textAlign: "center",
-    border: "1px solid #0049AB",
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 15,
-    textAlign: "center",
-  },
-  link: {
-    color: "#2683ff",
-    fontWeight: "bold",
-    textDecorationLine: "underline",
-  },
-  footer: {
-    marginTop: 20,
-    width: "100%",
-    alignItems: "center",
-  },
-  backgroundVideo: {
-    position: "absolute",
+  imagemTopo: {
+    width: '100%',
+    height: 150,
+    position: 'absolute',
     top: 0,
     left: 0,
-    bottom: 0,
     right: 0,
-    width: "100%",
-    height: "100%",
+    zIndex: 1,
   },
-  circuloFundo: {
-    position: "absolute",
-    top: "20%",
-    left: 0,
-    transform: [{ scale: 1.1 }],
+  patternText: {
+    fontSize: 28,
+    fontWeight: "bold",
+    color: "#E8F0FF",
+    letterSpacing: 8,
+    marginBottom: -5,
   },
   logincomp: {
-    transform: [{ scale: 1 }],
+    width: "85%",
+    alignItems: "center",
+    marginTop: 120,
+  },
+  logo: {
+    width: 280,
+    height: 80,
+    marginBottom: 10,
+  },
+  subtitle: {
+    fontSize: 16,
+    color: "#666",
+    marginBottom: 40,
+    textAlign: "center",
+  },
+  inteligente: {
+    color: "#0049AB",
+    fontWeight: "600",
+  },
+  input: {
+    width: "100%",
+    height: 50,
+    borderWidth: 1,
+    borderColor: "#0049AB",
+    borderRadius: 25,
+    paddingHorizontal: 15,
+    marginBottom: 15,
+    color: "#0049AB",
+    fontSize: 16,
+  },
+  inputSenha: {
+    width: "100%",
+    height: 50,
+    borderWidth: 1,
+    borderColor: "#0049AB",
+    borderRadius: 25,
+    paddingHorizontal: 15,
+    marginBottom: 15,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+  },
+  inputTextSenha: {
+    color: "#0049AB",
+    flex: 1,
+    fontSize: 16,
+  },
+  forgotPassword: {
+    color: "#0049AB",
+    fontSize: 13,
+    alignSelf: "flex-end",
+    marginTop: 5,
+    marginBottom: 25,
+  },
+  buttonsContainer: {
+    flexDirection: "row",
+    width: "100%",
+    justifyContent: "space-between",
+    gap: 15,
+  },
+  buttonVoltar: {
+    flex: 1,
+    backgroundColor: "#F5F5F5",
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderRadius: 30,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+  buttonVoltarText: {
+    color: "#000",
+    fontSize: 16,
+    fontWeight: "500",
+  },
+  buttonEntrar: {
+    flex: 1,
+    backgroundColor: "#0049AB",
+    paddingVertical: 16,
+    paddingHorizontal: 20,
+    borderRadius: 30,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+  },
+  buttonEntrarText: {
+    color: "#fff",
+    fontSize: 16,
+    fontWeight: "600",
+  },
+  logoFooter: {
+    width: 120,
+    height: 40,
+    marginBottom: 20,
   },
 });
 

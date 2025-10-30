@@ -51,6 +51,7 @@ app.get('/consultas/usuario/:id_usuario',RotasConsultas.ListarConsultasPorUsuari
 app.post('/historicoConsultas', RotasHistoricoConsultas.CriarHistoricoConsulta); //criar um novo historico de consulta
 app.get('/historicoConsultas', RotasHistoricoConsultas.ListarHistoricoConsultas); //listar todos os historicos de consultas
 app.get('/historicoConsultas/:id_historico', RotasHistoricoConsultas.ListarHistoricoConsultaPorId); //listar um historico de consulta por id
+app.get('/historicoconsultas/usuario/:id_usuario', RotasHistoricoConsultas.ListarHistoricoConsultaPorUsuario) //listar por id_usuario
 app.delete('/historicoConsultas/:id_historico', RotasHistoricoConsultas.DeletarHistoricoConsulta); //deletar um historico de consulta
 app.patch('/historicoConsultas/:id_historico', RotasHistoricoConsultas.AtualizarHistoricoConsulta); //atualizar todos os campos de um historico de consulta
 app.put('/historicoConsultas/:id_historico', RotasHistoricoConsultas.AtualizarTodos); //atualizar campos especificos de um historico de consulta

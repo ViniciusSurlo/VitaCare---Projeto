@@ -11,6 +11,7 @@ import Consultas from "./src/pages/Consultas";
 import Cadastro from "./src/pages/Cadastro";
 import Configuracoes from "./src/pages/Configuracoes"; // <-- se ainda não existir, crie essa tela
 import Perfil from "./src/pages/Perfil";
+import Historico from "./src/pages/Historico";
 
 import "./global.css";
 
@@ -73,6 +74,11 @@ export default function App() {
         <Stack.Screen 
           name='Perfil'
           component={Perfil}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen 
+          name='Historico'
+          component={Historico}
           options={{ headerShown: false }}
         />
 

@@ -5,6 +5,7 @@ import Medicamentos from "./Medicamentos";
 import Consultas from "./Consultas"
 import Cadastro from "./Cadastro";
 import Perfil from "./Perfil";
+import Historico from './Historico'
 // import TelaInicial from "./TelaInicial"
 import Introducao from "./Introducao";
 
@@ -15,12 +16,13 @@ export default function MenuDrawer(){
         <Drawer.Navigator>
             {/* <Drawer.Screen name="TelaInicial" component={TelaInicial} /> */}
             <Drawer.Screen name="Introducao" component={Introducao} />
-            <Drawer.Screen name="Cadastro" component={Cadastro} />
-            <Drawer.Screen name="Medicamentos" component={Medicamentos} />
             <Drawer.Screen name="Login" component={Login} />
+            <Drawer.Screen name="Cadastro" component={Cadastro} />
             <Drawer.Screen name="Landing" component={Landing} />
+            <Drawer.Screen name="Medicamentos" component={Medicamentos} />
             <Drawer.Screen name='Consultas' component={Consultas} />
             <Drawer.Screen name='Perfil' component={Perfil} />
+            <Drawer.Screen name='Historico' component={Historico} />
         </Drawer.Navigator>
     )
 }

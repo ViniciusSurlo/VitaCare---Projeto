@@ -41,6 +41,28 @@ class RotasHistoricoConsultas{
             res.status(500).json({ error: "Erro ao listar o historico de consulta" });
         }
     }
+
+    static async ListarHistoricoConsultaPorUsuario(req, res) {
+        const { id_usuario } = req.params;
+
+        try {
+            const historico = await BD.query(
+            `SELECT hc.id_consulta, hc.id_usuario, c.local, c.data, c.hora, c.especialidade FROM historicoconsultas as hc
+                inner join consultas as c on c.id_consulta = hc.id_consulta
+                WHERE hc.id_usuario = $1`,
+            [id_usuario]
+            );
+
+            if (historico.rows.length === 0) {
+            return res.status(200).json([]);
+            }
+
+            res.status(200).json(historico.rows);
+        } catch (error) {
+            console.error("Erro ao listar o historico de consulta:", error);
+            res.status(500).json({ error: "Erro ao listar o historico de consulta" });
+        }
+}
     
     static async DeletarHistoricoConsulta(req, res){
         const {id_historico} = req.params 

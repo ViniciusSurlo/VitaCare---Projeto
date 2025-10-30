@@ -1,11 +1,33 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView, Image, ImageBackground } from "react-native";
 import { Ionicons, MaterialIcons, FontAwesome } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 // Removida a importação de LinearGradient, pois usaremos ImageBackground
 
 export default function Configuracoes() {
   const navigation = useNavigation();
+  const [usuario, setUsuario] = useState("");
+  const [id_usuario, setIdUsuario] = useState("");
+
+  useEffect(() => {
+    const carregarUsuario = async () => {
+      try {
+        const usuarioJSON = await AsyncStorage.getItem("UsuarioLogado");
+        if (usuarioJSON) {
+          const usuario = JSON.parse(usuarioJSON);
+          setUsuario(usuario);
+          setIdUsuario(usuario.id_usuario);
+          console.log('dados:', usuario);
+          
+        }
+      } catch (erro) {
+        console.error("Erro ao carregar usuário logado:", erro);
+      }
+    };
+
+    carregarUsuario();
+  }, [])
 
   return (
     <ScrollView style={styles.container}>
@@ -13,14 +35,14 @@ export default function Configuracoes() {
       {/* 1. USANDO O ESTILO DEFINIDO NO STYLESHEET AGORA */}
       <ImageBackground
         source={require('../assets/gradient.jpg')} 
-        style={styles.headerBackground} /* <--- NOVO ESTILO */         
+        style={styles.headerBackground} 
         resizeMode="cover"
       >
-        <View style={styles.headerContent}> {/* <--- NOVO CONTAINER PARA CENTRALIZAR O CONTEÚDO */}
+        <View style={styles.headerContent}>
           <View style={styles.avatar}>
-            <Text style={styles.avatarText}>MB</Text>
+            <Text style={styles.avatarText}>😎</Text>
           </View>
-          <Text style={styles.userName}>Mariana Borba</Text>
+          <Text style={styles.userName}>{usuario.nome}</Text>
         </View>
       </ImageBackground>
 
@@ -79,6 +101,27 @@ export default function Configuracoes() {
             <Ionicons name="help-circle" size={24} color="#444" />
           </View>
           <Text style={styles.menuText}>Ajuda</Text>
+        </TouchableOpacity>
+
+        {/* Botão SAIR */}
+        <TouchableOpacity
+          style={[styles.menuButton, styles.menuButtonStandard]}
+          onPress={async () => {
+            try {
+              await AsyncStorage.removeItem("UsuarioLogado"); // remove o usuário salvo
+              navigation.reset({
+                index: 0,
+                routes: [{ name: 'Login' }], // garante que o stack seja reiniciado na tela de login
+              });
+            } catch (error) {
+              console.error("Erro ao deslogar:", error);
+            }
+          }}
+        >
+          <View style={styles.iconBackground}>
+            <Ionicons name="log-out" size={24} color="#444" />
+          </View>
+          <Text style={styles.menuText}>Sair</Text>
         </TouchableOpacity>
 
       </View>

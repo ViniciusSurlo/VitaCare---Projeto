@@ -29,8 +29,13 @@ export default function Medicamentos({ navigation }) {
   const [modalAddVisible, setModalAddVisible] = useState(false);
   const [modalEditVisible, setModalEditVisible] = useState(false);
 
-  // Variáveis de data e dia
+  // Variáveis de data e hora
   const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showDatePickerFim, setShowDatePickerFim] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+  const [pickerMode, setPickerMode] = useState('date');
+  const [selectedTime, setSelectedTime] = useState('');
+  const [selectedHorarios, setSelectedHorarios] = useState([]);
   const [diasTratamento, setDiasTratamento] = useState("");
 
   // Estado para controlar card expandido
@@ -94,17 +99,45 @@ useEffect(() => {
     setModalAddVisible(true);
   };
 
-  const onChangeDataInicio = (event, selectedDate) => {
-    setShowDatePicker(false);
-    if (selectedDate) {
-      const formatada = selectedDate.toISOString().split("T")[0];
-      setDataInicio(formatada);
-
-      // recalcula data_fim se já tiver dias
-      if (diasTratamento) {
-        const fim = new Date(selectedDate);
-        fim.setDate(fim.getDate() + parseInt(diasTratamento));
-        setDataFim(fim.toISOString().split("T")[0]);
+  // Handler para mudanças de data e hora
+  const onDateTimeChange = (event, selected) => {
+    if (pickerMode === 'date') {
+      // Fecha o picker
+      setShowDatePicker(false);
+      setShowDatePickerFim(false);
+      
+      if (selected) {
+        const formatada = selected.toISOString().split("T")[0];
+        
+        // Verifica qual picker de data está ativo
+        if (showDatePicker) {
+          setDataInicio(formatada);
+          
+          // Recalcula data_fim se já tiver dias
+          if (diasTratamento) {
+            const fim = new Date(selected);
+            fim.setDate(fim.getDate() + parseInt(diasTratamento));
+            setDataFim(fim.toISOString().split("T")[0]);
+          }
+        } else if (showDatePickerFim) {
+          setDataFim(formatada);
+        }
+      }
+    } else if (pickerMode === 'time') {
+      // Fecha o picker de hora
+      setShowTimePicker(false);
+      
+      if (selected) {
+        const hora = selected.getHours().toString().padStart(2, '0');
+        const minutos = selected.getMinutes().toString().padStart(2, '0');
+        const horarioFormatado = `${hora}:${minutos}`;
+        
+        // Adiciona o horário à lista se ainda não existir
+        if (!selectedHorarios.includes(horarioFormatado)) {
+          const novosHorarios = [...selectedHorarios, horarioFormatado].sort();
+          setSelectedHorarios(novosHorarios);
+          setHorarios(novosHorarios.join(', '));
+        }
       }
     }
   };
@@ -418,38 +451,41 @@ useEffect(() => {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <Text style={styles.modalTitle}>Adicionar Medicamento</Text>
-              <Text style={styles.CampoTitulo}>Nome</Text>
+              <Text style={styles.CampoTitulo}>Nome do remédio</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Nome"
+                placeholder="ex: Rivotril"
                 value={nome}
                 onChangeText={setNome}
               />
-              <Text style={styles.CampoTitulo}>Frequência</Text>
+              <Text style={styles.CampoTitulo}>Frequência </Text>
               <TextInput
                 style={styles.input}
-                placeholder="Frequência"
+                placeholder="quantas vezes ao dia?"
                 value={frequencia}
                 onChangeText={setFrequencia}
               />
               <Text style={styles.CampoTitulo}>Observações</Text>
               <TextInput
                 style={styles.input}
-                placeholder="Observações"
+                placeholder="ex: tomar com água..."
                 value={observacoes}
                 onChangeText={setObservacoes}
               />
-              <Text style={styles.CampoTitulo}>Dosagem</Text>
+              <Text style={styles.CampoTitulo}>Dosagem </Text>
               <TextInput
                 style={styles.input}
-                placeholder="Dosagem"
+                placeholder="quantos mg por dia?"
                 value={dosagem}
                 onChangeText={setDosagem}
               />
               <Text style={styles.CampoTitulo}>Data Início</Text>
               <TouchableOpacity
                 style={styles.input}
-                onPress={() => setShowDatePicker(true)}
+                onPress={() => {
+                  setPickerMode('date');
+                  setShowDatePicker(true);
+                }}
               >
                 <Text>{data_inicio || "Selecione a data início"}</Text>
               </TouchableOpacity>
@@ -459,7 +495,7 @@ useEffect(() => {
                   value={data_inicio ? new Date(data_inicio) : new Date()}
                   mode="date"
                   display="default"
-                  onChange={onChangeDataInicio}
+                  onChange={onDateTimeChange}
                 />
               )}
 
@@ -473,18 +509,63 @@ useEffect(() => {
               />
 
               <Text style={styles.CampoTitulo}>Data Fim</Text>
-              <TextInput
-                style={[styles.input, { backgroundColor: "#f0f0f0" }]}
-                value={data_fim}
-                editable={false}
-              />
-              <Text style={styles.CampoTitulo}>Horários</Text>
-              <TextInput
+              <TouchableOpacity
                 style={styles.input}
-                placeholder="Horários"
-                value={horarios}
-                onChangeText={setHorarios}
-              />
+                onPress={() => {
+                  setPickerMode('date');
+                  setShowDatePickerFim(true);
+                }}
+              >
+                <Text>{data_fim || "Selecione a data fim"}</Text>
+              </TouchableOpacity>
+
+              <Text style={styles.CampoTitulo}>Horários de Medicação</Text>
+              <View style={styles.horariosContainer}>
+                {selectedHorarios.map((horario, index) => (
+                  <TouchableOpacity 
+                    key={index}
+                    style={styles.horarioChip}
+                    onPress={() => {
+                      const novosHorarios = selectedHorarios.filter(h => h !== horario);
+                      setSelectedHorarios(novosHorarios);
+                      setHorarios(novosHorarios.join(', '));
+                    }}
+                  >
+                    <Text style={styles.horarioChipText}>{horario}</Text>
+                    <Text style={styles.horarioChipDelete}>×</Text>
+                  </TouchableOpacity>
+                ))}
+                <TouchableOpacity
+                  style={styles.addHorarioBtn}
+                  onPress={() => {
+                    setPickerMode('time');
+                    setShowTimePicker(true);
+                  }}
+                >
+                  <Text style={styles.addHorarioText}>+ Adicionar Horário</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Date Picker para Data Fim */}
+              {showDatePickerFim && (
+                <DateTimePicker
+                  value={data_fim ? new Date(data_fim) : new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={onDateTimeChange}
+                  minimumDate={data_inicio ? new Date(data_inicio) : undefined}
+                />
+              )}
+
+              {/* Time Picker para Horários */}
+              {showTimePicker && (
+                <DateTimePicker
+                  value={new Date()}
+                  mode="time"
+                  display="default"
+                  onChange={onDateTimeChange}
+                />
+              )}
 
               <View style={styles.modalButtons}>
                 <TouchableOpacity
@@ -518,7 +599,7 @@ useEffect(() => {
 
               <TextInput
                 style={styles.input}
-                placeholder="Nome"
+                placeholder="Nome do remédio"
                 value={remedioSelecionado?.nome || ""}
                 onChangeText={(text) =>
                   setRemedioSelecionado({ ...remedioSelecionado, nome: text })
@@ -526,7 +607,7 @@ useEffect(() => {
               />
               <TextInput
                 style={styles.input}
-                placeholder="Dosagem"
+                placeholder="Dosagem (quantos gramas ou miligramas)"
                 value={remedioSelecionado?.dosagem || ""}
                 onChangeText={(text) =>
                   setRemedioSelecionado({
@@ -537,7 +618,7 @@ useEffect(() => {
               />
               <TextInput
                 style={styles.input}
-                placeholder="Frequência"
+                placeholder="Quantas vezes ao dia?"
                 value={remedioSelecionado?.frequencia || ""}
                 onChangeText={(text) =>
                   setRemedioSelecionado({
@@ -557,39 +638,118 @@ useEffect(() => {
                   })
                 }
               />
-              <TextInput
+              <Text style={styles.CampoTitulo}>Data Início</Text>
+              <TouchableOpacity
                 style={styles.input}
-                placeholder="Data Início"
-                value={remedioSelecionado?.data_inicio || ""}
-                onChangeText={(text) =>
-                  setRemedioSelecionado({
-                    ...remedioSelecionado,
-                    data_inicio: text,
-                  })
-                }
-              />
-              <TextInput
+                onPress={() => {
+                  setPickerMode('date');
+                  setShowDatePicker(true);
+                }}
+              >
+                <Text>{remedioSelecionado?.data_inicio || "Selecione a data início"}</Text>
+              </TouchableOpacity>
+
+              <Text style={styles.CampoTitulo}>Data Fim</Text>
+              <TouchableOpacity
                 style={styles.input}
-                placeholder="Data Fim"
-                value={remedioSelecionado?.data_fim || ""}
-                onChangeText={(text) =>
-                  setRemedioSelecionado({
-                    ...remedioSelecionado,
-                    data_fim: text,
-                  })
-                }
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Horário"
-                value={remedioSelecionado?.horarios || ""}
-                onChangeText={(text) =>
-                  setRemedioSelecionado({
-                    ...remedioSelecionado,
-                    horarios: text,
-                  })
-                }
-              />
+                onPress={() => {
+                  setPickerMode('date');
+                  setShowDatePickerFim(true);
+                }}
+              >
+                <Text>{remedioSelecionado?.data_fim || "Selecione a data fim"}</Text>
+              </TouchableOpacity>
+
+              {/* Date Picker para Data Início */}
+              {showDatePicker && (
+                <DateTimePicker
+                  value={remedioSelecionado?.data_inicio ? new Date(remedioSelecionado.data_inicio) : new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={(event, selected) => {
+                    setShowDatePicker(false);
+                    if (selected) {
+                      setRemedioSelecionado({
+                        ...remedioSelecionado,
+                        data_inicio: selected.toISOString().split('T')[0]
+                      });
+                    }
+                  }}
+                />
+              )}
+
+              {/* Date Picker para Data Fim */}
+              {showDatePickerFim && (
+                <DateTimePicker
+                  value={remedioSelecionado?.data_fim ? new Date(remedioSelecionado.data_fim) : new Date()}
+                  mode="date"
+                  display="default"
+                  onChange={(event, selected) => {
+                    setShowDatePickerFim(false);
+                    if (selected) {
+                      setRemedioSelecionado({
+                        ...remedioSelecionado,
+                        data_fim: selected.toISOString().split('T')[0]
+                      });
+                    }
+                  }}
+                  minimumDate={remedioSelecionado?.data_inicio ? new Date(remedioSelecionado.data_inicio) : undefined}
+                />
+              )}
+              <Text style={styles.CampoTitulo}>Horários de Medicação</Text>
+              <View style={styles.horariosContainer}>
+                {(remedioSelecionado?.horarios || '').split(', ').filter(h => h).map((horario, index) => (
+                  <TouchableOpacity 
+                    key={index}
+                    style={styles.horarioChip}
+                    onPress={() => {
+                      const horarios = remedioSelecionado.horarios.split(', ').filter(h => h !== horario);
+                      setRemedioSelecionado({
+                        ...remedioSelecionado,
+                        horarios: horarios.join(', ')
+                      });
+                    }}
+                  >
+                    <Text style={styles.horarioChipText}>{horario}</Text>
+                    <Text style={styles.horarioChipDelete}>×</Text>
+                  </TouchableOpacity>
+                ))}
+                <TouchableOpacity
+                  style={styles.addHorarioBtn}
+                  onPress={() => {
+                    setPickerMode('time');
+                    setShowTimePicker(true);
+                  }}
+                >
+                  <Text style={styles.addHorarioText}>+ Adicionar Horário</Text>
+                </TouchableOpacity>
+              </View>
+
+              {/* Time Picker para Horários */}
+              {showTimePicker && (
+                <DateTimePicker
+                  value={new Date()}
+                  mode="time"
+                  display="default"
+                  onChange={(event, selected) => {
+                    setShowTimePicker(false);
+                    if (selected) {
+                      const hora = selected.getHours().toString().padStart(2, '0');
+                      const minutos = selected.getMinutes().toString().padStart(2, '0');
+                      const horarioFormatado = `${hora}:${minutos}`;
+                      const horariosAtuais = remedioSelecionado?.horarios?.split(', ').filter(h => h) || [];
+                      
+                      if (!horariosAtuais.includes(horarioFormatado)) {
+                        const novosHorarios = [...horariosAtuais, horarioFormatado].sort().join(', ');
+                        setRemedioSelecionado({
+                          ...remedioSelecionado,
+                          horarios: novosHorarios
+                        });
+                      }
+                    }
+                  }}
+                />
+              )}
 
               <View style={styles.modalButtons}>
                 <TouchableOpacity
@@ -621,6 +781,41 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     backgroundColor: "rgba(0,0,0,0.5)",
+  },
+  horariosContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    paddingVertical: 8,
+  },
+  horarioChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#e3e3e3',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+  },
+  horarioChipText: {
+    fontSize: 14,
+    marginRight: 4,
+  },
+  horarioChipDelete: {
+    fontSize: 18,
+    color: '#666',
+  },
+  addHorarioBtn: {
+    backgroundColor: '#f0f0f0',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: '#ccc',
+  },
+  addHorarioText: {
+    color: '#666',
+    fontSize: 14,
   },
   modalContent: {
     width: "90%",

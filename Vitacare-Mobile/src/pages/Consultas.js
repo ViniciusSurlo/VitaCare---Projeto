@@ -202,7 +202,7 @@ export default function Consultas({ navigation }) {
         <View className="flex-1 justify-center items-center bg-black/60">
           <View className="bg-white rounded-2xl p-6 w-11/12 max-w-md">
             <Text className="text-xl font-bold text-blue-700 mb-4">Adicionar Consulta</Text>
-            <Text className="text-base font-semibold mb-1">Especialidade</Text>
+            <Text className="text-base font-semibold mb-1">Especialidade do Doutor</Text>
 
             {/* GRID BOTÕES */}
             <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-around", marginTop: 20, paddingHorizontal: 10 }}>
@@ -251,13 +251,14 @@ export default function Consultas({ navigation }) {
             {/* inputs */}
             <Text className="text-base font-semibold mb-1">Data</Text>
             <TextInput className="bg-gray-100 rounded-xl px-4 py-2 mb-2 text-base" placeholder="AAAA-MM-DD" value={data} onChangeText={setData} />
-            <Text className="text-base font-semibold mb-1">Hora</Text>
+            <Text className="text-base font-semibold mb-1">Horário da Consulta</Text>
             <TextInput className="bg-gray-100 rounded-xl px-4 py-2 mb-2 text-base" placeholder="HH:MM:SS" value={hora} onChangeText={setHora} />
-            <Text className="text-base font-semibold mb-1">Local</Text>
+            <Text className="text-base font-semibold mb-1">Local da Consulta</Text>
             <TextInput className="bg-gray-100 rounded-xl px-4 py-2 mb-2 text-base" placeholder="ex: Hospital" value={local} onChangeText={setLocal} />
             <Text className="text-base font-semibold mb-1">Observações</Text>
             <TextInput className="bg-gray-100 rounded-xl px-4 py-2 mb-2 text-base" placeholder="ex: Levar CPF e RG" value={observacoes} onChangeText={setObservacoes} />
             <Text className="text-base font-semibold mb-1">Horários</Text>
+            {/* adicionar a opção de "não sei se devo retornar novamente em outros horarios" */}
             <TextInput className="bg-gray-100 rounded-xl px-4 py-2 mb-4 text-base" placeholder="Horários" value={horarios} onChangeText={setHorarios} />
 
             {/* botões */}
