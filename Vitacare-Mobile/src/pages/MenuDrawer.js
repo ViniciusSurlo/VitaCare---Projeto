@@ -8,13 +8,13 @@ import Perfil from "./Perfil";
 import Historico from './Historico'
 // import TelaInicial from "./TelaInicial"
 import Introducao from "./Introducao";
+import IACare from "./IACare";
 
 const Drawer = createDrawerNavigator();
 
 export default function MenuDrawer(){
     return(
         <Drawer.Navigator>
-            {/* <Drawer.Screen name="TelaInicial" component={TelaInicial} /> */}
             <Drawer.Screen name="Introducao" component={Introducao} />
             <Drawer.Screen name="Login" component={Login} />
             <Drawer.Screen name="Cadastro" component={Cadastro} />
@@ -23,6 +23,7 @@ export default function MenuDrawer(){
             <Drawer.Screen name='Consultas' component={Consultas} />
             <Drawer.Screen name='Perfil' component={Perfil} />
             <Drawer.Screen name='Historico' component={Historico} />
+            <Drawer.Screen name='IACare' component={IACare} />
         </Drawer.Navigator>
     )
 }

@@ -6,7 +6,6 @@ import {
   StyleSheet,
   Modal,
   TextInput,
-  SafeAreaView,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
@@ -119,7 +118,7 @@ export default function Perfil() {
   }, []);
 
   return (
-    <SafeAreaView style={styles.safeContainer}>
+    <View style={styles.safeContainer}>
       <View style={styles.container}>
         <Modal
           visible={modalEditarVisible}
@@ -251,7 +250,7 @@ export default function Perfil() {
           </View>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

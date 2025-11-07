@@ -48,9 +48,9 @@ const Login = () => {
       console.log("Login bem-sucedido:", dados);
 
       // Sempre salva os dados do usuário
-      await AsyncStorage.setItem("UsuarioLogado", JSON.stringify(dados));
+      await AsyncStorage.setItem("UsuarioLogado", JSON.stringify({dados}));
 
-      // Mas se não quiser lembrar, marca um flag temporário
+      // se não quiser lembrar, marca um flag temporário
       if (!lembrar) {
         await AsyncStorage.setItem("NaoLembrar", "true");
       } else {
@@ -142,6 +142,7 @@ const Login = () => {
         <TouchableOpacity 
           style={styles.lembrarContainer} 
           onPress={() => setLembrar(!lembrar)}
+          value={lembrar}
         >
           <MaterialCommunityIcons 
             name={lembrar ? "checkbox-marked" : "checkbox-blank-outline"} 

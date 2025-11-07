@@ -19,7 +19,9 @@ import moment from "moment";
 import { StatusBar } from 'expo-status-bar';
 import { enderecoServidor } from "../utils.js";
 
-export default function Landing({ navigation }) {
+export default function Landing({ navigation, route }) {
+
+  const { usuarioLogado } = route.params || {};
   const [usuario, setUsuario] = useState("");
   const [id_usuario, setIdUsuario] = useState("");
   const [dadosDashboard, setDadosDashboard] = useState({
@@ -48,13 +50,20 @@ export default function Landing({ navigation }) {
     <View style={styles.modalOverlay}>
       <KeyboardAvoidingView 
         behavior={Platform.OS === "ios" ? "padding" : "height"}
-        style={styles.modalContainer}
-        keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
+        style={[
+          styles.modalContainer,
+          Platform.OS === 'android' && keyboardHeight > 0 && {
+            maxHeight: height - keyboardHeight - 40
+          }
+        ]}
+        keyboardVerticalOffset={0}
       >
         {/* Header do Modal */}
         <View style={styles.modalHeader}>
           <View style={styles.headerLeft}>
-            <MaterialCommunityIcons name="robot" size={24} color="#007AFF" />
+            <View style={styles.iconContainer}>
+              <MaterialCommunityIcons name="robot" size={28} color="#007AFF" />
+            </View>
             <View>
               <Text style={styles.modalTitulo}>Análise com IA</Text>
               <View style={styles.statusContainer}>
@@ -71,8 +80,9 @@ export default function Landing({ navigation }) {
               setTextoInputIA("");
             }}
             style={styles.btnFechar}
+            activeOpacity={0.7}
           >
-            <Ionicons name="close" size={24} color="#000" />
+            <Ionicons name="close" size={22} color="#666" />
           </TouchableOpacity>
         </View>
 
@@ -84,6 +94,7 @@ export default function Landing({ navigation }) {
           onContentSizeChange={() =>
             scrollViewRef.current?.scrollToEnd({ animated: true })
           }
+          showsVerticalScrollIndicator={false}
         >
           {mensagensIA.length === 0 ? (
             <View style={styles.mensagemVazia}>
@@ -97,6 +108,7 @@ export default function Landing({ navigation }) {
               <TouchableOpacity
                 style={styles.btnGerarAnalise}
                 onPress={gerarAnaliseAutomatica}
+                activeOpacity={0.8}
               >
                 <MaterialCommunityIcons name="auto-fix" size={20} color="#fff" />
                 <Text style={styles.btnGerarTexto}>Gerar Análise</Text>
@@ -138,27 +150,27 @@ export default function Landing({ navigation }) {
 
         {/* Guia de perguntas sugeridas */}
         {mensagensIA.length === 0 && !carregandoAnalise && (
-          <ScrollView 
-            horizontal 
-            showsHorizontalScrollIndicator={false}
-            style={styles.perguntasContainer}
-            contentContainerStyle={styles.perguntasContent}
-          >
-            {perguntasSugeridas.map((pergunta, index) => (
-              <TouchableOpacity
-                key={index}
-                style={styles.perguntaSugerida}
-                onPress={() => {
-                  setTextoInputIA(pergunta);
-                }}
-              >
-                <Text style={styles.perguntaSugeridaTexto}>{pergunta}</Text>
-              </TouchableOpacity>
-            ))}
-          </ScrollView>
+          <View style={styles.perguntasWrapper}>
+            <ScrollView 
+              horizontal 
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={styles.perguntasContent}
+            >
+              {perguntasSugeridas.map((pergunta, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.perguntaSugerida}
+                  onPress={() => setTextoInputIA(pergunta)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={styles.perguntaSugeridaTexto}>{pergunta}</Text>
+                </TouchableOpacity>
+              ))}
+            </ScrollView>
+          </View>
         )}
 
-        {/* Input de mensagem */}
+        {/* Input */}
         <View style={styles.inputContainer}>
           <View style={styles.inputWrapper}>
             <TextInput
@@ -170,16 +182,22 @@ export default function Landing({ navigation }) {
               multiline
               maxLength={500}
             />
-
             <TouchableOpacity
-              style={styles.btnEnviar}
+              style={[
+                styles.btnEnviar,
+                (!textoInputIA.trim() || carregandoAnalise) &&
+                  styles.btnEnviarDisabled,
+              ]}
               onPress={enviarPerguntaIA}
               disabled={!textoInputIA.trim() || carregandoAnalise}
+              activeOpacity={0.7}
             >
               <Ionicons
                 name="send"
-                size={24}
-                color={textoInputIA.trim() && !carregandoAnalise ? "#007AFF" : "#ccc"}
+                size={22}
+                color={
+                  textoInputIA.trim() && !carregandoAnalise ? "#007AFF" : "#ccc"
+                }
               />
             </TouchableOpacity>
           </View>
@@ -372,21 +390,21 @@ export default function Landing({ navigation }) {
   };
 
   useEffect(() => {
-    const carregarUsuario = async () => {
-      try {
-        const usuarioJSON = await AsyncStorage.getItem("UsuarioLogado");
-        if (usuarioJSON) {
-          const usuario = JSON.parse(usuarioJSON);
-          setUsuario(usuario);
-          setIdUsuario(usuario.id_usuario);
-        }
-      } catch (erro) {
-        console.error("Erro ao carregar usuário logado:", erro);
+  const carregarUsuario = async () => {
+    try {
+      const usuarioJSON = await AsyncStorage.getItem("UsuarioLogado");
+      if (usuarioJSON) {
+        const usuario = JSON.parse(usuarioJSON);
+        setUsuario(usuario);
+        const id = usuario.id_usuario          
+        setIdUsuario(id);
       }
-    };
-
-    carregarUsuario();
-  }, []);
+    } catch (erro) {
+      console.error("Erro ao carregar usuário logado:", erro);
+    }
+  };
+  carregarUsuario();
+}, []);
 
   // buscar medicamentos do usuário uma vez que o id esteja disponível
   useEffect(() => {
@@ -449,7 +467,7 @@ export default function Landing({ navigation }) {
               />
               <View>
                 <Text style={styles.bomdia}>Bom dia,</Text>
-                <Text style={styles.usuario}>{usuario.nome}.</Text>
+                <Text style={styles.usuario}>{usuarioLogado.nome}.</Text>
               </View>
             </TouchableOpacity>
 
@@ -528,17 +546,11 @@ export default function Landing({ navigation }) {
 
           <TouchableOpacity
             style={styles.card}
-            onPress={abrirModalIA}
+            onPress={() => navigation.navigate("IACare")}
           >
             <MaterialCommunityIcons name="robot" size={28} color="#0049AB" />
             <Text style={styles.cardTitle}>IACare</Text>
             <Text style={styles.cardSub}>Converse com a IA</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Configuracoes')}>
-            <Ionicons name="settings-outline" size={28} color="#0049AB" />
-            <Text style={styles.cardTitle}>Configurações</Text>
-            <Text style={styles.cardSub}>Veja aqui suas configurações</Text>
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -548,6 +560,12 @@ export default function Landing({ navigation }) {
             <MaterialIcons name="event-available" size={28} color="#0049AB" />
             <Text style={styles.cardTitle}>Consultas</Text>
             <Text style={styles.cardSub}>Veja aqui suas consultas</Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.card} onPress={() => navigation.navigate('Configuracoes')}>
+            <Ionicons name="settings-outline" size={28} color="#0049AB" />
+            <Text style={styles.cardTitle}>Configurações</Text>
+            <Text style={styles.cardSub}>Veja aqui suas configurações</Text>
           </TouchableOpacity>
         </View>
        
@@ -655,7 +673,6 @@ const styles = StyleSheet.create({
     right: 0,
     bottom: 0,
     backgroundColor: "rgba(0,0,0,0.5)",
-    justifyContent: "center",
     alignItems: "center",
     zIndex: 999,
   },
@@ -665,6 +682,7 @@ const styles = StyleSheet.create({
     width: "95%",
     maxHeight: "85%",
     shadowColor: "#000",
+    marginTop: 100,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.3,
     shadowRadius: 8,
@@ -888,7 +906,7 @@ const styles = StyleSheet.create({
     marginTop: 4
   },
   verMaisBtn: {
-    backgroundColor: '#6146c6',
+    backgroundColor: '#007AFF',
     paddingHorizontal: 12,
     paddingVertical: 8,
     borderRadius: 8,

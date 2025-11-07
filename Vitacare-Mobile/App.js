@@ -12,6 +12,8 @@ import Cadastro from "./src/pages/Cadastro";
 import Configuracoes from "./src/pages/Configuracoes"; // <-- se ainda não existir, crie essa tela
 import Perfil from "./src/pages/Perfil";
 import Historico from "./src/pages/Historico";
+import IACare from "./src/pages/IACare";
+import Ajuda from "./src/pages/Ajuda";
 
 import "./global.css";
 
@@ -79,6 +81,16 @@ export default function App() {
         <Stack.Screen 
           name='Historico'
           component={Historico}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen 
+          name='IACare'
+          component={IACare}
+          options={{ headerShown: false }}
+        />
+        <Stack.Screen 
+          name='Ajuda'
+          component={Ajuda}
           options={{ headerShown: false }}
         />
 

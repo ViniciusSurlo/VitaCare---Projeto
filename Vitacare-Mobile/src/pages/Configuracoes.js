@@ -29,6 +29,11 @@ export default function Configuracoes() {
     carregarUsuario();
   }, [])
 
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem("UsuarioLogado");
+    navigation.replace("Login");
+  };
+
   return (
     <ScrollView style={styles.container}>
     
@@ -95,7 +100,7 @@ export default function Configuracoes() {
         {/* Botão Ajuda (Padrão) - Adicionado da imagem */}
         <TouchableOpacity
           style={[styles.menuButton, styles.menuButtonStandard]}
-          onPress={() => { /* Navegar para a tela de Ajuda, se existir */ }}
+          onPress={() => {navigation.navigate("Ajuda")}}
         >
           <View style={styles.iconBackground}>
             <Ionicons name="help-circle" size={24} color="#444" />
@@ -106,17 +111,7 @@ export default function Configuracoes() {
         {/* Botão SAIR */}
         <TouchableOpacity
           style={[styles.menuButton, styles.menuButtonStandard]}
-          onPress={async () => {
-            try {
-              await AsyncStorage.removeItem("UsuarioLogado"); // remove o usuário salvo
-              navigation.reset({
-                index: 0,
-                routes: [{ name: 'Login' }], // garante que o stack seja reiniciado na tela de login
-              });
-            } catch (error) {
-              console.error("Erro ao deslogar:", error);
-            }
-          }}
+          onPress={handleLogout}
         >
           <View style={styles.iconBackground}>
             <Ionicons name="log-out" size={24} color="#444" />

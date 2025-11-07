@@ -135,25 +135,35 @@ export default function Consultas({ navigation }) {
   };
 
   const exibirItemLista = ({ item }) => (
-    <View className="bg-gray-200 rounded-3xl p-4 m-2 flex-1">
-      <View className="flex-row items-center mb-2">
-        <View className="w-8 h-8 rounded-full bg-blue-600 mr-2" />
-        <View>
-          <Text className="font-bold text-sm">{item.especialidade}</Text>
-          <Text className="text-blue-600 text-xs mt-2 mb-2">
-            {item.data.split("T")[0].split("-").reverse().join("/")}
+    <View style={{ width: '100%', paddingHorizontal: 8, marginBottom: 16 }}>
+      <View className="bg-white rounded-3xl p-5 shadow-sm">
+        {/* Cabeçalho com círculo azul e info */}
+        <View className="flex-row items-start mb-4">
+          <View className="w-10 h-10 rounded-full bg-blue-600 mr-4" />
+          <View className="flex-1">
+            <Text className="font-bold text-lg text-gray-800">{item.especialidade}</Text>
+              <Text className="text-gray-500 text-sm">
+                {item.data.split("T")[0].split("-").reverse().join("/")} às {item.hora}
+              </Text>
+          </View>
+          <TouchableOpacity onPress={() => botaoExcluir(item.id_consulta)} className="border-4 flex flex-row border-white bg-gray-100 rounded-full w-12 h-12 justify-center items-center space-x-2">
+            <Ionicons name="trash-sharp" size={24} color="blue" />
+          </TouchableOpacity>
+        </View>
+
+        {/* Área de observações */}
+        <View className="bg-gray-100 rounded-2xl p-4 mb-4" style={{ minHeight: 80 }}>
+          <Text className="text-gray-800 text-base leading-6">
+            {item.observacoes || "Sem observações"}
           </Text>
-          <Text className="text-blue-600 text-xs">{item.hora}</Text>
+        </View>
+
+        {/* Info adicional */}
+        <View className="flex-row gap-2 items-center flex-wrap">
+          <MaterialCommunityIcons name="hospital-marker" size={24} color="blue" />
+          <Text className="text-gray-500 text-sm">{item.local}</Text>
         </View>
       </View>
-      <Text className="text-black text-xs mb-6">{item.observacoes}</Text>
-      <TouchableOpacity className="bg-white px-3 py-1 rounded-full self-start flex-row items-center">
-        <View className="w-2 h-2 rounded-full bg-blue-500 mr-1" />
-        <Text className="text-blue-500 text-xs">Horários</Text>
-      </TouchableOpacity>
-      <TouchableOpacity className="self-end mt-2" onPress={() => botaoExcluir(item.id_consulta)}>
-        <Ionicons name="trash" size={20} color="#0065FB" />
-      </TouchableOpacity>
     </View>
   );
 
@@ -190,9 +200,7 @@ export default function Consultas({ navigation }) {
         data={dadosLista}
         renderItem={exibirItemLista}
         keyExtractor={(item, index) => String(item.id || index)}
-        numColumns={2}
-        contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 16 }}
-        columnWrapperStyle={{ justifyContent: "space-between" }}
+        contentContainerStyle={{ paddingBottom: 16 }}
       />
 
       {/* Modal principal */}

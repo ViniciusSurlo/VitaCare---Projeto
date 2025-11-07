@@ -461,21 +461,21 @@ useEffect(() => {
               <Text style={styles.CampoTitulo}>Frequência </Text>
               <TextInput
                 style={styles.input}
-                placeholder="quantas vezes ao dia?"
+                placeholder="Quantas vezes ao dia?"
                 value={frequencia}
                 onChangeText={setFrequencia}
               />
               <Text style={styles.CampoTitulo}>Observações</Text>
               <TextInput
                 style={styles.input}
-                placeholder="ex: tomar com água..."
+                placeholder="ex: Tomar com água..."
                 value={observacoes}
                 onChangeText={setObservacoes}
               />
               <Text style={styles.CampoTitulo}>Dosagem </Text>
               <TextInput
                 style={styles.input}
-                placeholder="quantos mg por dia?"
+                placeholder="Quantos mg por dia?"
                 value={dosagem}
                 onChangeText={setDosagem}
               />
